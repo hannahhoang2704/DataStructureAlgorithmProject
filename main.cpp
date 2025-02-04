@@ -1,19 +1,36 @@
 #include <iostream>
 #include <fstream>
-#include <string>
-#include <sstream>
-#include <unistd.h> // for sleep()
-
-#define SENSOR_ID "28-01193a10a833"
-#define SENSOR_MEASUREMENTS_PATH "/sys/bus/w1/devices/28-01193a10a833/w1_slave"
+#include <map>
+#include <queue>
+#include <unistd.h>  // For sleep()
 
 using namespace std;
 
-string get_temp() {
-    ifstream file(SENSOR_MEASUREMENTS_PATH);
+#define SENSOR_ID "28-01193a10a833"
+#define SENSORS_PATH "/sys/bus/w1/devices/"
+#define MAX_QUEUE_SIZE 100
+
+
+struct TempReading {
+    double value;
+    time_t timestamp;
+    int sensorID;
+
+    TempReading(double temp, int id) : value(temp), sensorID(id) {
+        timestamp = time(nullptr); // get current time
+    }
+};
+
+queue<TempReading> tempQueue;
+map<int, string> sensorMap {
+        {1, "28-01193a10a833"}
+};
+
+float get_temp(const string& sensorDir) {
+    ifstream file(SENSORS_PATH + sensorDir + "/w1_slave");
     if (!file.is_open()) {
-        cerr << "Error: Could not open " << SENSOR_MEASUREMENTS_PATH << endl;
-        return "N/A";
+        cerr << "Error: Could not open " << SENSORS_PATH + sensorDir << endl;
+        return 0.0;
     }
 
     string line, temp_data;
@@ -25,19 +42,36 @@ string get_temp() {
     file.close();
 
     if (!temp_data.empty()) {
-        float temp = stoi(temp_data) / 1000.0;
-            ostringstream stream;
-            stream << temp << " °C";
-            return stream.str();
+        return stoi(temp_data) / 1000.0;
     }
 
-    return "N/A";
+    return 0.0;
 
+}
+
+void addTempToQueue(double temp, int sensorID) {
+    if (tempQueue.size() >= MAX_QUEUE_SIZE) {
+        tempQueue.pop();
+    }
+    tempQueue.push(TempReading(temp, sensorID));
+}
+
+void printQueue() {
+    queue<TempReading> tempCopy = tempQueue;
+    while (!tempCopy.empty()) {
+        TempReading reading = tempCopy.front();
+        cout << "Sensor " << reading.sensorID << ": " << reading.value << "°C at  " << ctime(&reading.timestamp);
+        tempCopy.pop();
+    }
 }
 
 int main(){
     while (true) {
-        cout << "Temperature: " << get_temp() << endl;
+        for (const auto& [id, sensorDir] : sensorMap) {
+            double temp = get_temp(sensorDir);
+            addTempToQueue(temp, id);
+        }
+        printQueue();
         sleep(2);
     }
 }
