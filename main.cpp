@@ -25,7 +25,7 @@ string get_temp() {
     file.close();
 
     if (!temp_data.empty()) {
-        float temp = stoi(temp_data) / 100.0;
+        float temp = stoi(temp_data) / 1000.0;
             ostringstream stream;
             stream << temp << " °C";
             return stream.str();
