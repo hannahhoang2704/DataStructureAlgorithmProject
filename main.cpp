@@ -24,7 +24,8 @@ struct TempReading {
 
 queue<TempReading> tempQueue;
 map<int, string> sensorMap {
-        {1, "28-00000087fb7c"}
+        {1, "28-00000087fb7c"},
+        {2, "28-00000085e6ff"}
 };
 
 vector<float> temperatureHistory;  // For storing temperature readings for the graph
