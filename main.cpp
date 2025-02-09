@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#define SENSOR_ID "28-01193a10a833"
+#define SENSOR_ID "28-00000087fb7c"
 #define SENSORS_PATH "/sys/bus/w1/devices/"
 #define MAX_QUEUE_SIZE 100
 
@@ -24,7 +24,7 @@ struct TempReading {
 
 queue<TempReading> tempQueue;
 map<int, string> sensorMap {
-        {1, "28-01193a10a833"}
+        {1, "28-00000087fb7c"}
 };
 
 vector<float> temperatureHistory;  // For storing temperature readings for the graph
