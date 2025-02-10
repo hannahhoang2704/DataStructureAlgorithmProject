@@ -7,6 +7,7 @@
 #include <deque>
 #include <iostream>
 #include <mutex>
+#include <condition_variable>
 #include "InfoNode.h"
 
 using namespace std;
