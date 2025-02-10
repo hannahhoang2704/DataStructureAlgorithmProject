@@ -1,6 +1,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include "TemperatureSensor.h"
+#include "QueueManager.h"
 
 using namespace std;
 using json = nlohmann::json;
