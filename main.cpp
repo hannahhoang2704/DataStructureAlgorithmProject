@@ -2,10 +2,10 @@
 #include <fstream>
 #include <map>
 #include <queue>
-#include <unistd.h>  // For sleep()
 #include <vector>
 
 using namespace std;
+using namespace std::chrono;
 
 #define SENSOR_ID "28-00000087fb7c"
 #define SENSORS_PATH "/sys/bus/w1/devices/"
@@ -18,7 +18,7 @@ struct TempReading {
     int sensorID;
 
     TempReading(double temp, int id) : value(temp), sensorID(id) {
-        timestamp = time(nullptr); // get current time
+        timestamp = system_clock::now(); // get current time
     }
 };
 
@@ -28,8 +28,6 @@ map<int, string> sensorMap {
         {2, "28-00000085e6ff"},
         {3, "28-000000849be2"}
 };
-
-vector<float> temperatureHistory;  // For storing temperature readings for the graph
 
 // Function to read temperature data from a sensor file
 float get_temp(const string& sensorDir) {
@@ -59,19 +57,13 @@ void addTempToQueue(double temp, int sensorID) {
         tempQueue.pop();
     }
     tempQueue.push(TempReading(temp, sensorID));
-    temperatureHistory.push_back(temp);
-
-    // Limit the number of points on the graph (optional)
-    if (temperatureHistory.size() > 100) {
-        temperatureHistory.erase(temperatureHistory.begin());
-    }
 }
 
 void printQueue() {
     queue<TempReading> tempCopy = tempQueue;
     while (!tempCopy.empty()) {
         TempReading reading = tempCopy.front();
-        cout << "Sensor " << reading.sensorID << ": " << reading.value << "°C at  " << ctime(&reading.timestamp);
+        cout << "Sensor " << reading.sensorID << ": " << reading.value << "°C at " << put_time(localtime(&timeT), "%Y-%m-%d %H:%M:%S");
         tempCopy.pop();
     }
 }
@@ -84,6 +76,6 @@ int main() {
             addTempToQueue(temp, id);
         }
         printQueue();
-        sleep(2);
+        this_thread::sleep_for(chrono::milliseconds(2000));
     }
 }
