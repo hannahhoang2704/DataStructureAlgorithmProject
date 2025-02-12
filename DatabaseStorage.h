@@ -8,6 +8,7 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <thread>
+#include <map>
 #include <mutex>
 #include "QueueManager.h"
 #include "InfoNode.h"
@@ -28,8 +29,10 @@ private:
     QueueManager& queue_manager;
     bool running;
     json json_data = json{};
+    map<string, map<uint64_t , int>> data_container;
     mutex file_lock;
     thread database_writer;
+    __thread_id thread_id;
     void write_database();
 };
 

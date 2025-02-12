@@ -8,7 +8,7 @@
 using namespace std;
 using json = nlohmann::json;
 int main(){
-    string json_file_path = "/Users/HannahHoang/DataStructureAlgorithmProject/database/database.json";
+    string json_file_path = "/Users/HannahHoang/DataStructureAlgorithmProject/database/database.json"; //MUST CHANGE THIS TO LOCAL ABS PATH
 
     QueueManager queue_manager;
     DatabaseStorage database(json_file_path, queue_manager);
@@ -28,5 +28,14 @@ int main(){
     json j_data;
     j_data = database.read_database();
     cout << "json database  " << j_data.dump(4) << endl;
+    map<string, map<uint64_t, int>> sensor_data = j_data.get<map<string, map<uint64_t, int>>>();
+    for (const auto& [sensor, readings] : sensor_data) {
+        cout << "Sensor: " << sensor << endl;
+        for (const auto& [timestamp, temp] : readings) {
+            if (temp > 3) {
+                cout << "  Timestamp: " << timestamp << " -> Temp: " << temp << endl;
+            }
+        }
+    }
     return EXIT_SUCCESS;
 }

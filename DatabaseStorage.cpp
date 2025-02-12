@@ -13,9 +13,10 @@ DatabaseStorage::~DatabaseStorage() {
 }
 
 void DatabaseStorage::start_write_thread() {
-    cout << "Start database writer thread" << endl;
     running = true;
     database_writer = thread(&DatabaseStorage::write_database, this);
+    thread_id = database_writer.get_id();
+    cout << "Start database writer thread " << thread_id << endl;
 }
 
 void DatabaseStorage::write_database() {
@@ -23,14 +24,11 @@ void DatabaseStorage::write_database() {
         InfoNode node;
         if(queue_manager.pop_data(node)){
             lock_guard<mutex> lock(file_lock);
-            string sensor_name = node.name;
-            auto timestamp = to_string(node.timestamps);
-            auto value = node.temp;
-
-            json_data[sensor_name][timestamp] = value;
+            data_container[node.name][node.timestamps] = node.temp;
 
             ofstream write_file(file_path);
             if(write_file.is_open()){
+                json_data = json(data_container);
                 cout << "Write data " << json_data << " to json write_file " << file_path << endl;
                 write_file << json_data.dump(4);
                 write_file.close();
@@ -41,7 +39,7 @@ void DatabaseStorage::write_database() {
 
         this_thread::sleep_for(chrono::nanoseconds(500) );
     }
-    cout << "Stop database writer thread" << endl;
+    cout << "Stop database writer thread " << thread_id << endl;
 }
 
 void DatabaseStorage::stop_write_thread() {

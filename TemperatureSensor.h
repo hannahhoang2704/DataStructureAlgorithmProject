@@ -29,6 +29,7 @@ private:
     int interval;
     bool terminated = false;
     thread temperature_reader;
+    __thread_id thread_id;
     QueueManager & queue_manager;
     void read_temperature();
     int read_sensor();
