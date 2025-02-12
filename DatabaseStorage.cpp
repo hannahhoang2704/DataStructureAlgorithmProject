@@ -15,8 +15,8 @@ DatabaseStorage::~DatabaseStorage() {
 void DatabaseStorage::start_write_thread() {
     running = true;
     database_writer = thread(&DatabaseStorage::write_database, this);
-    thread_id = database_writer.get_id();
-    cout << "Start database writer thread " << thread_id << endl;
+    // thread_id = database_writer.get_id();
+    cout << "Start database writer thread " << endl;
 }
 
 void DatabaseStorage::write_database() {
@@ -39,7 +39,7 @@ void DatabaseStorage::write_database() {
 
         this_thread::sleep_for(chrono::nanoseconds(500) );
     }
-    cout << "Stop database writer thread " << thread_id << endl;
+    cout << "Stop database writer thread " << endl;
 }
 
 void DatabaseStorage::stop_write_thread() {

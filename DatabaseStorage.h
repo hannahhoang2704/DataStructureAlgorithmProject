@@ -32,7 +32,6 @@ private:
     map<string, map<uint64_t , int>> data_container;
     mutex file_lock;
     thread database_writer;
-    __thread_id thread_id;
     void write_database();
 };
 
