@@ -17,14 +17,17 @@
 using namespace std;
 class TemperatureSensor {
 public:
-    TemperatureSensor(const string name, uint32_t gpio, QueueManager& dequeue, int interval=1): name(name), gpio(gpio), queue_manager(dequeue), interval(interval){};
+    TemperatureSensor(const string name, const string sensorDir, QueueManager& dequeue, int interval=1): name(name), sensorDir(sensorDir), queue_manager(dequeue), interval(interval){
+        //TODO: the best is to open the file only once here when constructing class
+        //readFile();
+    };
     ~TemperatureSensor();
     void start_temp_reading_thread();
     void stop_temp_reading_thread();
     int get_temperature();
 private:
     const string name;
-    uint32_t gpio;
+    const string sensorDir;
     float temp=0;
     int interval;
     bool terminated = false;
@@ -32,6 +35,7 @@ private:
     QueueManager & queue_manager;
     void read_temperature();
     int read_sensor();
+    void readFile();
 };
 
 

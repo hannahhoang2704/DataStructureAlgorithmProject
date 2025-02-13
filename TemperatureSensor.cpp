@@ -3,6 +3,7 @@
 //
 
 #include "TemperatureSensor.h"
+#include "InfoNode.h"
 
 TemperatureSensor::~TemperatureSensor() {
     stop_temp_reading_thread();
@@ -18,6 +19,7 @@ void TemperatureSensor::stop_temp_reading_thread() {
     cout << "Stop temperature reading thread " << temperature_reader.get_id() <<endl;
     terminated = true;
     if(temperature_reader.joinable()) temperature_reader.join();
+    //TODO:close the file here once thread terminated
 }
 
 void TemperatureSensor::read_temperature() {
@@ -38,5 +40,6 @@ int TemperatureSensor::get_temperature() {
 }
 
 int TemperatureSensor::read_sensor(){
+    //todo read the last number and do calc
     return temp++; //replace this temp simulator
 }
