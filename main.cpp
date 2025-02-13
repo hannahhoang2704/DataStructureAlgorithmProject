@@ -42,7 +42,7 @@ int main(){
 
     // Process stored temperature readings from the queue
     while (!queue_manager.is_empty()) {
-        InfoNode node = queue_manager.pop_front();
+        InfoNode node = queue_manager.pop_data();
 
         // Convert InfoNode data to JSON
         json sensor_json = {

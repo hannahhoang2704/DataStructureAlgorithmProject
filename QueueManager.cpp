@@ -18,3 +18,8 @@ bool QueueManager::pop_data(InfoNode &node) {
     node_queue.pop_front();
     return true;
 }
+
+bool QueueManager::is_empty() {
+    lock_guard<mutex> lock(queue_mutex);
+    return node_queue.empty();
+}
