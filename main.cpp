@@ -29,7 +29,7 @@ int main(){
 
     TemperatureSensor temp_sensor1("sensor1", sensorMap[1],  queue_manager, 3);
     TemperatureSensor temp_sensor2("sensor2", sensorMap[2], queue_manager, 3);
-    TemperatureSensor temp_sensor3("sensor2", sensorMap[3], queue_manager, 3);
+    TemperatureSensor temp_sensor3("sensor3", sensorMap[3], queue_manager, 3);
 
     temp_sensor1.start_temp_reading_thread();
     temp_sensor2.start_temp_reading_thread();
@@ -42,13 +42,14 @@ int main(){
 
     // Process stored temperature readings from the queue
     while (!queue_manager.is_empty()) {
-        InfoNode node = queue_manager.pop_data();
+        InfoNode node("", 0, 0.0);
+        queue_manager.pop_data(node);
 
         // Convert InfoNode data to JSON
         json sensor_json = {
-                {"sensor", node.name},
-                {"timestamp", node.timestamp},
-                {"temperature", node.temperature}
+                {"sensor", node.get_name()},
+                {"timestamp", node.get_timestamp()},
+                {"temperature", node.get_temperature()}
         };
 
         // Print JSON to console
