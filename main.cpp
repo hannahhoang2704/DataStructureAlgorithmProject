@@ -1,7 +1,10 @@
 #include <iostream>
+#include <fstream>
+#include <map>
 #include <nlohmann/json.hpp>
 #include "TemperatureSensor.h"
 #include "QueueManager.h"
+#include "InfoNode.h"
 
 using namespace std;
 using json = nlohmann::json;
@@ -21,11 +24,12 @@ int main(){
             {2, "28-00000085e6ff"},
             {3, "28-000000849be2"}
     };
+
+    QueueManager queue_manager;
+
     TemperatureSensor temp_sensor1("sensor1", sensorMap[1],  queue_manager, 3);
     TemperatureSensor temp_sensor2("sensor2", sensorMap[2], queue_manager, 3);
     TemperatureSensor temp_sensor3("sensor2", sensorMap[3], queue_manager, 3);
-
-    QueueManager queue_manager;
 
     temp_sensor1.start_temp_reading_thread();
     temp_sensor2.start_temp_reading_thread();
