@@ -15,7 +15,7 @@ void TemperatureSensor::start_temp_reading_thread() {
 }
 
 void TemperatureSensor::stop_temp_reading_thread() {
-    cout << "Stop temperature reading thread " << temperature_reader.get_id() <<endl;
+    cout << "Stop temperature reading thread for " << name << endl;
     terminated = true;
     if(temperature_reader.joinable()) temperature_reader.join();
 }
@@ -30,7 +30,6 @@ void TemperatureSensor::read_temperature() {
         queue_manager.push_back(node);
         this_thread::sleep_for(chrono::seconds(interval));
     }
-    cout << "Thread " << temperature_reader.get_id() << " terminated" << endl;
 }
 
 int TemperatureSensor::get_temperature() {
