@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <map>
 #include <nlohmann/json.hpp>
 #include "TemperatureSensor.h"
 #include "QueueManager.h"
@@ -11,12 +13,21 @@ int main(){
     // string json_file_path = "/Users/HannahHoang/DataStructureAlgorithmProject/database/database.json"; //MUST CHANGE THIS TO LOCAL ABS PATH
     string json_file_path = "/home/hannah/DataStructureAlgorithmProject/database/database.json"; //MUST CHANGE THIS TO LOCAL ABS PATH
 
+    // Map sensor IDs to their corresponding directory names
+    map<int, string> sensorMap {
+            {1, "28-00000087fb7c"},
+            {2, "28-00000085e6ff"},
+            {3, "28-000000849be2"}
+    };
+
     QueueManager queue_manager;
     DatabaseStorage database(json_file_path, queue_manager);
     database.start_write_thread();
-    TemperatureSensor temp_sensor1("sensor1", 0,  queue_manager, 3);
-    TemperatureSensor temp_sensor2("sensor2",1, queue_manager);
-    TemperatureSensor temp_sensor3("sensor3",1, queue_manager, 4);
+
+    TemperatureSensor temp_sensor1("sensor1", sensorMap[1],  queue_manager, 3);
+    TemperatureSensor temp_sensor2("sensor2", sensorMap[2], queue_manager);
+    TemperatureSensor temp_sensor3("sensor3", sensorMap[3], queue_manager, 4);
+
     temp_sensor1.start_temp_reading_thread();
     temp_sensor2.start_temp_reading_thread();
     temp_sensor3.start_temp_reading_thread();
