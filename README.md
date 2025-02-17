@@ -13,8 +13,14 @@ A JSON library for C++.
 - **Ubuntu/Debian Installation:**
 ```sh
 sudo apt install nlohmann-json3-dev
+```
 
-## imgui
+## imgui dependencies
 ```sh
+sudo apt-get update
 sudo apt install libglfw3-dev libgles2-mesa-dev
+sudo apt install libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
+sudo apt install libglew-dev
+```
+
 
