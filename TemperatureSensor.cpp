@@ -20,6 +20,11 @@ TemperatureSensor::~TemperatureSensor() {
 
 void TemperatureSensor::start_temp_reading_thread() {
     cout << "Reading temperature from "<< name << " every " << interval << " seconds"<< endl;
+    if (temperature_reader.joinable()) {
+        terminated = true;  // Ensure the old thread terminates
+        temperature_reader.join();  // Wait for the previous thread to exit
+    }
+
     terminated = false;
     temperature_reader= thread(&TemperatureSensor::read_temperature, this);
 }
@@ -54,8 +59,10 @@ void TemperatureSensor::read_temperature() {
 
 float TemperatureSensor::get_temperature() {
     if (!sensor_file.is_open()) {
+        cerr << "Reopening sensor file for " << name << endl;
         openFile();
         if (!sensor_file.is_open()) {
+            cerr << "ERROR: Could not reopen sensor file for " << name << endl;
             return -100;
         }
     }
