@@ -5,7 +5,6 @@
 #ifndef DATASTRUCTUREALGORITHMSPROJECT_QUEUEMANAGER_H
 #define DATASTRUCTUREALGORITHMSPROJECT_QUEUEMANAGER_H
 #include <deque>
-#include <queue>
 #include <iostream>
 #include <mutex>
 #include <condition_variable>
@@ -18,7 +17,6 @@ public:
     void push_back(InfoNode& node);
     bool pop_data(InfoNode &node);
     bool is_empty();
-    queue<InfoNode> get_all();
 private:
     deque<InfoNode> node_queue;
     mutex queue_mutex;

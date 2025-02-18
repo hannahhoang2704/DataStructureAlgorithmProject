@@ -23,7 +23,6 @@ public:
     json read_database();
     void start_write_thread();
     void stop_write_thread();
-    void write_all_data_to_json();
 
 private:
     string file_path;

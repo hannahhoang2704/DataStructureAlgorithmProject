@@ -23,12 +23,3 @@ bool QueueManager::pop_data(InfoNode &node) {
     }
 
 }
-
-queue<InfoNode> QueueManager::get_all() {
-    lock_guard<std::mutex> lock(queue_mutex);
-    queue<InfoNode> copy_queue;
-    for (const auto& node : node_queue) {
-        copy_queue.push(node);
-    }
-    return copy_queue;
-}
