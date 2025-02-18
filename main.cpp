@@ -174,7 +174,7 @@ int main(){
             ImVec2 button_size(200, 50);
             if (ImGui::Button("Start Measure", button_size)) {
                 counter++;
-                database.start_write_thread();
+                //database.start_write_thread();
                 temp_sensor1.start_temp_reading_thread();
                 temp_sensor2.start_temp_reading_thread();
                 temp_sensor3.start_temp_reading_thread();
@@ -188,7 +188,8 @@ int main(){
                 temp_sensor1.stop_temp_reading_thread();
                 temp_sensor2.stop_temp_reading_thread();
                 temp_sensor3.stop_temp_reading_thread();
-                database.stop_write_thread();
+                //database.stop_write_thread();
+                database.write_all_data_to_json();
             }
             ImGui::Spacing();
             ImGui::Spacing();

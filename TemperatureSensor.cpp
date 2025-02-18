@@ -43,7 +43,6 @@ void TemperatureSensor::read_temperature() {
         uint64_t timestamp = chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch()).count();
         auto t_c = static_cast<time_t>(timestamp);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(750));  // ensure previous temp conversion completes
         float temp = get_temperature();
 
         if (temp == -100) {

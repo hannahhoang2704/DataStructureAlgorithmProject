@@ -65,3 +65,27 @@ json DatabaseStorage::read_database() {
         return json{};
     }
 }
+
+void DatabaseStorage::write_all_data_to_json() {
+    lock_guard<mutex> lock(file_lock);
+    queue<InfoNode> data_queue = queue_manager.get_all();
+
+    json data_container;
+
+    while (!data_queue.empty()) {
+        InfoNode node = data_queue.front();
+        data_queue.pop();
+
+        data_container[node.name][node.timestamps] = node.temp;
+    }
+
+    ofstream write_file(file_path);
+    if (write_file.is_open()) {
+        json json_data = data_container;
+        cout << "Writing data to JSON file: " << file_path << endl;
+        write_file << json_data.dump(4);
+        write_file.close();
+    } else {
+        cerr << "Can't open file " << file_path << " to write" << endl;
+    }
+}

@@ -17,6 +17,7 @@ public:
     void push_back(InfoNode& node);
     bool pop_data(InfoNode &node);
     bool is_empty();
+    queue<InfoNode> get_all();
 private:
     deque<InfoNode> node_queue;
     mutex queue_mutex;
