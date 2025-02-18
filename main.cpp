@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <map>
 #include <nlohmann/json.hpp>
 
 //#include <SDL2/SDL.h>
