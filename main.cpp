@@ -156,7 +156,7 @@ int main(){
             static int counter = 0;
 
             ImGui::Begin("Sensor Dashboard");                          // Create a window called "Hello, world!" and append into it.
-
+            ImGui::SetWindowSize(ImVec2(800, 600));
             ImGui::Text("Sensor Controller");               // Display some text (you can use a format strings too)
 //            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
 //            ImGui::Checkbox("Another Window", &show_another_window);
@@ -229,6 +229,7 @@ int main(){
             sprintf(overlay3, "Avg: %.2f°C", calc_avg(temp_values3));
             ImGui::PlotLines("Sensor 3 Temperature", temp_values3, IM_ARRAYSIZE(temp_values3), temp_offset, overlay3, 0.0f, 30.0f, plot_size);
 
+            ImGui::PopStyleVar(); //reset padding
             ImGui::End();
         }
 
