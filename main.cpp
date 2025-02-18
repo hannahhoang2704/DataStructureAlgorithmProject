@@ -156,7 +156,7 @@ int main(){
             static int counter = 0;
 
             ImGui::Begin("Sensor Dashboard");                          // Create a window called "Hello, world!" and append into it.
-            ImGui::SetWindowSize(ImVec2(800, 600));
+            ImGui::SetWindowSize(ImVec2(1280, 720));
             ImGui::Text("Sensor Controller");               // Display some text (you can use a format strings too)
 //            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
 //            ImGui::Checkbox("Another Window", &show_another_window);
@@ -190,7 +190,7 @@ int main(){
                 temp_sensor3.stop_temp_reading_thread();
                 database.stop_write_thread();
             }
-
+            ImGui::Spacing();
 
             // Get latest temperature readings
             int temp1 = temp_sensor1.get_temperature();
@@ -212,7 +212,7 @@ int main(){
                 return std::accumulate(values, values + IM_ARRAYSIZE(temp_values1), 0.0f) / IM_ARRAYSIZE(temp_values1);
             };
 
-            ImVec2 plot_size(800, 300);
+            ImVec2 plot_size(400, 200);
 
             // Plot Sensor 1 Graph
             char overlay1[32];
