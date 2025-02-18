@@ -92,7 +92,7 @@ int main(){
 //    temp_sensor2.start_temp_reading_thread();
 //    temp_sensor3.start_temp_reading_thread();
 
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "TempSensors", nullptr, nullptr);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
     IMGUI_CHECKVERSION();
