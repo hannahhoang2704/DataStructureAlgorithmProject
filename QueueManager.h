@@ -5,6 +5,7 @@
 #ifndef DATASTRUCTUREALGORITHMSPROJECT_QUEUEMANAGER_H
 #define DATASTRUCTUREALGORITHMSPROJECT_QUEUEMANAGER_H
 #include <deque>
+#include <queue>
 #include <iostream>
 #include <mutex>
 #include <condition_variable>
