@@ -171,7 +171,7 @@ int main(){
             style.FramePadding = ImVec2(10, 5);    // Padding around buttons
 
 
-            ImVec2 button_size(200, 50);
+            ImVec2 button_size(100, 25);
             if (ImGui::Button("Start Measure", button_size)) {
                 counter++;
                 database.start_write_thread();
@@ -212,7 +212,7 @@ int main(){
                 return std::accumulate(values, values + IM_ARRAYSIZE(temp_values1), 0.0f) / IM_ARRAYSIZE(temp_values1);
             };
 
-            ImVec2 plot_size(400, 200);
+            ImVec2 plot_size(600, 100);
 
             // Plot Sensor 1 Graph
             char overlay1[32];
