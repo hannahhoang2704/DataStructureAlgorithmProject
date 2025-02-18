@@ -161,7 +161,18 @@ int main(){
 //            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
 //            ImGui::Checkbox("Another Window", &show_another_window);
 
-            if (ImGui::Button("Start Measure")) {
+            //ImGui::SetWindowFontScale(1.5f); //make text bigger, default is 1.0f
+            ImGuiIO& io = ImGui::GetIO();
+            io.FontGlobalScale = 1.5f; // scale everything (buttons, text, graphs) globally by 1.5x
+
+            ImGuiStyle& style = ImGui::GetStyle();
+            style.ItemSpacing = ImVec2(10, 10);   // Space between items
+            style.ItemInnerSpacing = ImVec2(5, 5);  // Space between inner elements of a button or text
+            style.FramePadding = ImVec2(10, 5);    // Padding around buttons
+
+
+            ImVec2 button_size(200, 50);
+            if (ImGui::Button("Start Measure", button_size)) {
                 counter++;
                 database.start_write_thread();
                 temp_sensor1.start_temp_reading_thread();
@@ -171,7 +182,7 @@ int main(){
 
             ImGui::SameLine();
 //            ImGui::Text("Start measuring counter = %d", counter);
-            if (ImGui::Button("Stop Measure"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+            if (ImGui::Button("Stop Measure", button_size))                            // Buttons return true when clicked (most widgets return true when edited/activated)
             {
                 counter--;
                 temp_sensor1.stop_temp_reading_thread();
@@ -201,17 +212,22 @@ int main(){
                 return std::accumulate(values, values + IM_ARRAYSIZE(temp_values1), 0.0f) / IM_ARRAYSIZE(temp_values1);
             };
 
+            ImVec2 plot_size(800, 300);
+
             // Plot Sensor 1 Graph
-            char overlay1[32]; sprintf(overlay1, "Avg: %.2f°C", calc_avg(temp_values1));
-            ImGui::PlotLines("Sensor 1 Temperature", temp_values1, IM_ARRAYSIZE(temp_values1), temp_offset, overlay1, 0.0f, 30.0f, ImVec2(0, 30.0f));
+            char overlay1[32];
+            sprintf(overlay1, "Avg: %.2f°C", calc_avg(temp_values1));
+            ImGui::PlotLines("Sensor 1 Temperature", temp_values1, IM_ARRAYSIZE(temp_values1), temp_offset, overlay1, 0.0f, 30.0f, plot_size);
 
             // Plot Sensor 2 Graph
-            char overlay2[32]; sprintf(overlay2, "Avg: %.2f°C", calc_avg(temp_values2));
-            ImGui::PlotLines("Sensor 2 Temperature", temp_values2, IM_ARRAYSIZE(temp_values2), temp_offset, overlay2, 0.0f, 30.0f, ImVec2(0, 30.0f));
+            char overlay2[32];
+            sprintf(overlay2, "Avg: %.2f°C", calc_avg(temp_values2));
+            ImGui::PlotLines("Sensor 2 Temperature", temp_values2, IM_ARRAYSIZE(temp_values2), temp_offset, overlay2, 0.0f, 30.0f, plot_size);
 
             // Plot Sensor 3 Graph
-            char overlay3[32]; sprintf(overlay3, "Avg: %.2f°C", calc_avg(temp_values3));
-            ImGui::PlotLines("Sensor 3 Temperature", temp_values3, IM_ARRAYSIZE(temp_values3), temp_offset, overlay3, 0.0f, 30.0f, ImVec2(0, 30.0f));
+            char overlay3[32];
+            sprintf(overlay3, "Avg: %.2f°C", calc_avg(temp_values3));
+            ImGui::PlotLines("Sensor 3 Temperature", temp_values3, IM_ARRAYSIZE(temp_values3), temp_offset, overlay3, 0.0f, 30.0f, plot_size);
 
             ImGui::End();
         }
