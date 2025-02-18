@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <map>
+#include <vector>
 #include <nlohmann/json.hpp>
 
 //#include <SDL2/SDL.h>
@@ -75,13 +75,18 @@ int main(){
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
 
+    vector<string> sensorDirs {
+        "28-00000087fb7c",
+        "28-00000085e6ff",
+        "28-000000849be2"
+    };
 
     QueueManager queue_manager;
     DatabaseStorage database(json_file_path, queue_manager);
 //    database.start_write_thread();
-    TemperatureSensor temp_sensor1("sensor1", 0,  queue_manager, 3);
-    TemperatureSensor temp_sensor2("sensor2",1, queue_manager);
-    TemperatureSensor temp_sensor3("sensor3",1, queue_manager, 4);
+    TemperatureSensor temp_sensor1("sensor1", sensorDirs[0], queue_manager, 3);
+    TemperatureSensor temp_sensor2("sensor2", sensorDirs[1], queue_manager);
+    TemperatureSensor temp_sensor3("sensor3", sensorDirs[2], queue_manager, 4);
 //    temp_sensor1.start_temp_reading_thread();
 //    temp_sensor2.start_temp_reading_thread();
 //    temp_sensor3.start_temp_reading_thread();
