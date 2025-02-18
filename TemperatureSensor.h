@@ -21,7 +21,7 @@ class TemperatureSensor {
 public:
     TemperatureSensor(const string name, const string sensorDir, QueueManager& dequeue, int interval=1): name(name), sensorDir(sensorDir), queue_manager(dequeue), interval(interval){
         //open the file only once here when constructing object
-        //openFile();
+        openFile();
     };
     ~TemperatureSensor();
 
