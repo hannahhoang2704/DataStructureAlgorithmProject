@@ -5,6 +5,8 @@
 #include "TemperatureSensor.h"
 #include "InfoNode.h"
 
+#define SENSORS_PATH "/sys/bus/w1/devices/"
+
 void TemperatureSensor::openFile() {
     sensor_file.open(SENSORS_PATH + sensorDir + "/w1_slave");
     if (!sensor_file.is_open()) {
@@ -35,10 +37,15 @@ void TemperatureSensor::read_temperature() {
     while(!terminated){
         uint64_t timestamp = chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch()).count();
         auto t_c = static_cast<time_t>(timestamp);
+
         float temp = get_temperature();
-        InfoNode node(name, timestamp, temp);
-        cout << "[" << put_time(localtime(&t_c), "%Y-%m-%d %H:%M:%S") << "]\t" << name << ": " << temp <<  " °C"<< endl;
-        queue_manager.push_back(node);
+        if (temp == -100) {
+            cerr << "Error: Failed to read temperature from: " << name << endl;
+        } else {
+            InfoNode node(name, timestamp, temp);
+            cout << "[" << put_time(localtime(&t_c), "%Y-%m-%d %H:%M:%S") << "]\t" << name << ": " << temp << " °C" << endl;
+            queue_manager.push_back(node);
+        }
         this_thread::sleep_for(chrono::seconds(interval));
     }
 }
@@ -47,7 +54,7 @@ float TemperatureSensor::get_temperature() {
     if (!sensor_file.is_open()) {
         openFile();
         if (!sensor_file.is_open()) {
-            return -1;
+            return -100;
         }
     }
 
@@ -65,5 +72,5 @@ float TemperatureSensor::get_temperature() {
         return stoi(temp_data) / 1000.0;
     }
 
-    return -1;
+    return -100;
 }
