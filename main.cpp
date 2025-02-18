@@ -171,7 +171,7 @@ int main(){
             style.FramePadding = ImVec2(10, 5);    // Padding around buttons
 
 
-            ImVec2 button_size(100, 25);
+            ImVec2 button_size(200, 50);
             if (ImGui::Button("Start Measure", button_size)) {
                 counter++;
                 database.start_write_thread();
@@ -190,6 +190,8 @@ int main(){
                 temp_sensor3.stop_temp_reading_thread();
                 database.stop_write_thread();
             }
+            ImGui::Spacing();
+            ImGui::Spacing();
             ImGui::Spacing();
 
             // Get latest temperature readings
