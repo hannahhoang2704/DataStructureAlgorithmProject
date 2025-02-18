@@ -229,7 +229,6 @@ int main(){
             sprintf(overlay3, "Avg: %.2f°C", calc_avg(temp_values3));
             ImGui::PlotLines("Sensor 3 Temperature", temp_values3, IM_ARRAYSIZE(temp_values3), temp_offset, overlay3, 0.0f, 30.0f, plot_size);
 
-            ImGui::PopStyleVar(); //reset padding
             ImGui::End();
         }
 
