@@ -18,6 +18,7 @@
 #include "QueueManager.h"
 #include "DatabaseStorage.h"
 #include "InfoNode.h"
+#include "SensorManager.h"
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
@@ -84,13 +85,19 @@ int main(){
 
     QueueManager queue_manager;
     DatabaseStorage database(json_file_path, queue_manager);
+    SensorManager sensor_manager;
 //    database.start_write_thread();
-    TemperatureSensor temp_sensor1("sensor1", sensorDirs[0], queue_manager, 4);
-    TemperatureSensor temp_sensor2("sensor2", sensorDirs[1], queue_manager, 4);
-    TemperatureSensor temp_sensor3("sensor3", sensorDirs[2], queue_manager, 4);
+    TemperatureSensor temp_sensor1("sensor1", sensorDirs[0], queue_manager, 4, false);
+    TemperatureSensor temp_sensor2("sensor1", sensorDirs[1], queue_manager, 4, false);
+    TemperatureSensor temp_sensor3("sensor3", sensorDirs[2], queue_manager, 4, false);
 //    temp_sensor1.start_temp_reading_thread();
 //    temp_sensor2.start_temp_reading_thread();
 //    temp_sensor3.start_temp_reading_thread();
+
+    sensor_manager.add_sensor(&temp_sensor1);
+    sensor_manager.add_sensor(&temp_sensor2);
+    sensor_manager.add_sensor(&temp_sensor3);
+    sensor_manager.startAll();
 
     GLFWwindow* window = glfwCreateWindow(1280, 720, "TempSensors", nullptr, nullptr);
     glfwMakeContextCurrent(window);

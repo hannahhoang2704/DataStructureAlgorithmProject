@@ -2,9 +2,6 @@
 // Created by Hanh Hoang on 7.2.2025.
 //
 
-#include "TemperatureSensor.h"
-#include "InfoNode.h"
-
 #define SENSORS_PATH "/sys/bus/w1/devices/"
 
 void TemperatureSensor::openFile() {
@@ -48,6 +45,9 @@ void TemperatureSensor::read_temperature() {
         if (temp == -100) {
             cerr << "Error: Failed to read temperature from: " << name << endl;
         } else {
+            if (!is_initialized) {
+                is_initialized = true;
+            }
             InfoNode node(name, timestamp, temp);
             cout << "[" << put_time(localtime(&t_c), "%Y-%m-%d %H:%M:%S") << "]\t" << name << ": " << temp << " °C" << endl;
             queue_manager.push_back(node);
@@ -57,6 +57,7 @@ void TemperatureSensor::read_temperature() {
 }
 
 float TemperatureSensor::get_temperature() {
+    lock_guard<mutex> lock(file_mutex);
     if (!sensor_file.is_open()) {
         cerr << "Reopening sensor file for " << name << endl;
         openFile();

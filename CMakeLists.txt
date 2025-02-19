@@ -55,6 +55,8 @@ add_executable(DataStructureAlgorithmsProject
         DatabaseStorage.h
         imgui/backends/imgui_impl_sdl2.cpp
         imgui/backends/imgui_impl_opengl3.cpp
+        SensorManager.h
+        SensorManager.cpp
 )
 
 target_include_directories(DataStructureAlgorithmsProject PRIVATE /usr/local/include)

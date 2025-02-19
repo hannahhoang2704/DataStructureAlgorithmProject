@@ -15,11 +15,14 @@
 #include <fstream>
 #include "InfoNode.h"
 #include "QueueManager.h"
+#include "SensorManager.h"
+#include "TemperatureSensor.h"
+#include "InfoNode.h"
 
 using namespace std;
 class TemperatureSensor {
 public:
-    TemperatureSensor(const string name, const string sensorDir, QueueManager& dequeue, int interval=1): name(name), sensorDir(sensorDir), queue_manager(dequeue), interval(interval){
+    TemperatureSensor(const string name, const string sensorDir, QueueManager& dequeue, int interval=1): name(name), sensorDir(sensorDir), queue_manager(dequeue), interval(interval), is_initialized(false){
         //open the file only once here when constructing object
         openFile();
     };
@@ -35,6 +38,8 @@ private:
     float temp=0;
     int interval;
     bool terminated = false;
+    atomic<bool> is_initialized; //semaphore to notify UI that the sensor is initialized
+    mutex file_mutex;
     ifstream sensor_file;
     thread temperature_reader;
     QueueManager & queue_manager;
