@@ -3,6 +3,7 @@
 //
 
 #include "TemperatureSensor.h"
+#include "SensorManager.h"
 
 #define SENSORS_PATH "/sys/bus/w1/devices/"
 

@@ -3,6 +3,10 @@
 //
 
 #include "SensorManager.h"
+#include "TemperatureSensor.h"
+#include <iostream>
+
+using namespace std;
 
 void SensorManager::addSensor(TemperatureSensor* sensor) {
     sensors.push_back(sensor);
