@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <nlohmann/json.hpp>
+#include <map>
 
 //#include <SDL2/SDL.h>
 #include "imgui.h"
@@ -86,13 +87,10 @@ int main(){
     QueueManager queue_manager;
     DatabaseStorage database(json_file_path, queue_manager);
     SensorManager sensor_manager;
-//    database.start_write_thread();
+
     TemperatureSensor temp_sensor1("sensor1", sensorDirs[0], queue_manager, 4);
     TemperatureSensor temp_sensor2("sensor2", sensorDirs[1], queue_manager, 4);
     TemperatureSensor temp_sensor3("sensor3", sensorDirs[2], queue_manager, 4);
-//    temp_sensor1.start_temp_reading_thread();
-//    temp_sensor2.start_temp_reading_thread();
-//    temp_sensor3.start_temp_reading_thread();
 
     sensor_manager.addSensor(&temp_sensor1);
     sensor_manager.addSensor(&temp_sensor2);
@@ -110,16 +108,13 @@ int main(){
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsLight();
+
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
 #ifdef __EMSCRIPTEN__
     ImGui_ImplGlfw_InstallEmscriptenCallbacks(window, "#canvas");
 #endif
     ImGui_ImplOpenGL3_Init(glsl_version);
-    // Our state
-    bool show_demo_window = true;
-    bool show_another_window = false;
-//    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
 #ifdef __EMSCRIPTEN__
@@ -152,14 +147,12 @@ int main(){
 //        if (show_demo_window)
 //            ImGui::ShowDemoWindow(&show_demo_window);
 
-        static float temp_values1[10] = {0};
-        static float temp_values2[10] = {0};
-        static float temp_values3[10] = {0};
+        static float temp_values1[10] = {};
+        static float temp_values2[10] = {};
+        static float temp_values3[10] = {};
         static int temp_offset = 0;
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
         {
-//            static float f = 0.0f;
-            static int counter = 0;
 
             ImGui::Begin("Sensor Dashboard");                          // Create a window called "Hello, world!" and append into it.
             ImGui::SetWindowSize(ImVec2(1280, 720));
@@ -179,7 +172,6 @@ int main(){
 
             ImVec2 button_size(200, 50);
             if (ImGui::Button("Start Measure", button_size)) {
-                counter++;
                 sensor_manager.startAll();
                 database.start_write_thread();
                 //temp_sensor1.start_temp_reading_thread();
@@ -188,10 +180,8 @@ int main(){
             }                           // Buttons return true when clicked (most widgets return true when edited/activated)
 
             ImGui::SameLine();
-//            ImGui::Text("Start measuring counter = %d", counter);
             if (ImGui::Button("Stop Measure", button_size))                            // Buttons return true when clicked (most widgets return true when edited/activated)
             {
-                counter--;
                 //temp_sensor1.stop_temp_reading_thread();
                 //temp_sensor2.stop_temp_reading_thread();
                 //temp_sensor3.stop_temp_reading_thread();
@@ -202,19 +192,18 @@ int main(){
             ImGui::Spacing();
             ImGui::Spacing();
 
-            // Get latest temperature readings
-            int temp1 = temp_sensor1.get_temperature();
-            int temp2 = temp_sensor2.get_temperature();
-            int temp3 = temp_sensor3.get_temperature();
+            float temp1 = temp_sensor1.temperature_getter();
+            float temp2 = temp_sensor2.temperature_getter();
+            float temp3 = temp_sensor3.temperature_getter();
 
-            ImGui::Text("Sensor 1:  %d°C", temp1);
-            ImGui::Text("Sensor 2:  %d°C", temp2);
-            ImGui::Text("Sensor 3:  %d°C", temp3);
+            ImGui::Text("Sensor 1:  %f°C", temp1);
+            ImGui::Text("Sensor 2:  %f°C", temp2);
+            ImGui::Text("Sensor 3:  %f°C", temp3);
 
             // Update circular buffers with new readings
-            temp_values1[temp_offset] = static_cast<float>(temp1);
-            temp_values2[temp_offset] = static_cast<float>(temp2);
-            temp_values3[temp_offset] = static_cast<float>(temp3);
+            temp_values1[temp_offset] = temp1;
+            temp_values2[temp_offset] = temp2;
+            temp_values3[temp_offset] = temp3;
             temp_offset = (temp_offset + 1) % IM_ARRAYSIZE(temp_values1);
 
             // Calculate average temperatures
@@ -227,17 +216,17 @@ int main(){
             // Plot Sensor 1 Graph
             char overlay1[32];
             sprintf(overlay1, "Avg: %.2f°C", calc_avg(temp_values1));
-            ImGui::PlotLines("Sensor 1 Temperature", temp_values1, IM_ARRAYSIZE(temp_values1), temp_offset, overlay1, 0.0f, 30.0f, plot_size);
+            ImGui::PlotLines("Sensor 1 Temperature", temp_values1, IM_ARRAYSIZE(temp_values1), temp_offset, overlay1, 0.0f, 100.0f, plot_size);
 
             // Plot Sensor 2 Graph
             char overlay2[32];
             sprintf(overlay2, "Avg: %.2f°C", calc_avg(temp_values2));
-            ImGui::PlotLines("Sensor 2 Temperature", temp_values2, IM_ARRAYSIZE(temp_values2), temp_offset, overlay2, 0.0f, 30.0f, plot_size);
+            ImGui::PlotLines("Sensor 2 Temperature", temp_values2, IM_ARRAYSIZE(temp_values2), temp_offset, overlay2, 0.0f, 100.0f, plot_size);
 
             // Plot Sensor 3 Graph
             char overlay3[32];
             sprintf(overlay3, "Avg: %.2f°C", calc_avg(temp_values3));
-            ImGui::PlotLines("Sensor 3 Temperature", temp_values3, IM_ARRAYSIZE(temp_values3), temp_offset, overlay3, 0.0f, 30.0f, plot_size);
+            ImGui::PlotLines("Sensor 3 Temperature", temp_values3, IM_ARRAYSIZE(temp_values3), temp_offset, overlay3, 0.0f, 100.0f, plot_size);
 
             ImGui::End();
         }

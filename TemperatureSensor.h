@@ -22,8 +22,7 @@
 using namespace std;
 class TemperatureSensor {
 public:
-    TemperatureSensor(const string name, const string sensorDir, QueueManager& dequeue, int interval=1): name(name), sensorDir(sensorDir), queue_manager(dequeue), interval(interval), is_initialized(false){
-        //open the file only once here when constructing object
+    TemperatureSensor(const string name, const string sensor_file_name, QueueManager& dequeue, int interval=1): name(name), file_name(sensor_file_name), queue_manager(dequeue), interval(interval), is_initialized(false){
         openFile();
     };
     ~TemperatureSensor();
@@ -31,15 +30,17 @@ public:
     void start_temp_reading_thread();
     void stop_temp_reading_thread();
     float get_temperature();
+    float temperature_getter();
     atomic<bool> is_initialized; //semaphore to notify UI that the sensor is initialized
 
 private:
     const string name;
-    const string sensorDir;
-    float temp=0;
+    const string file_name;
+    float temp=0.0;
     int interval;
     bool terminated = false;
     mutex file_mutex;
+    mutex temp_mutex;
     ifstream sensor_file;
     thread temperature_reader;
     QueueManager & queue_manager;

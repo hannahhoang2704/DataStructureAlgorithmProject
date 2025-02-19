@@ -8,9 +8,9 @@
 #define SENSORS_PATH "/sys/bus/w1/devices/"
 
 void TemperatureSensor::openFile() {
-    sensor_file.open(SENSORS_PATH + sensorDir + "/w1_slave");
+    sensor_file.open(SENSORS_PATH + file_name + "/w1_slave");
     if (!sensor_file.is_open()) {
-        cerr << "Error: Could not open " << SENSORS_PATH + sensorDir << endl;
+        cerr << "Error: Could not open " << SENSORS_PATH + file_name << endl;
     }
 }
 
@@ -21,8 +21,8 @@ TemperatureSensor::~TemperatureSensor() {
 void TemperatureSensor::start_temp_reading_thread() {
     cout << "Reading temperature from "<< name << " every " << interval << " seconds"<< endl;
     if (temperature_reader.joinable()) {
-        terminated = true;  // Ensure the old thread terminates
-        temperature_reader.join();  // Wait for the previous thread to exit
+        terminated = true;
+        temperature_reader.join();
     }
 
     terminated = false;
@@ -43,9 +43,10 @@ void TemperatureSensor::read_temperature() {
         uint64_t timestamp = chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch()).count();
         auto t_c = static_cast<time_t>(timestamp);
 
+        lock_guard<mutex> temp_lock(temp_mutex);
         float temp = get_temperature();
 
-        if (temp == -100) {
+        if (temp == -1) {
             cerr << "Error: Failed to read temperature from: " << name << endl;
         } else {
             if (!is_initialized) {
@@ -66,7 +67,7 @@ float TemperatureSensor::get_temperature() {
         openFile();
         if (!sensor_file.is_open()) {
             cerr << "ERROR: Could not reopen sensor file for " << name << endl;
-            return -100;
+            return -1;
         }
     }
 
@@ -81,8 +82,15 @@ float TemperatureSensor::get_temperature() {
     sensor_file.seekg(0, ios::beg);
 
     if (!temp_data.empty()) {
-        return stoi(temp_data) / 1000.0;
+        temp = stoi(temp_data) / 1000.0;
+        return temp;
     }
 
-    return -100;
+    return -1;
 }
+
+float TemperatureSensor::temperature_getter() {
+    lock_guard<mutex> temp_lock(temp_mutex);
+    return temp;
+}
+
