@@ -31,6 +31,7 @@ public:
     void start_temp_reading_thread();
     void stop_temp_reading_thread();
     float get_temperature();
+    atomic<bool> is_initialized; //semaphore to notify UI that the sensor is initialized
 
 private:
     const string name;
@@ -38,7 +39,6 @@ private:
     float temp=0;
     int interval;
     bool terminated = false;
-    atomic<bool> is_initialized; //semaphore to notify UI that the sensor is initialized
     mutex file_mutex;
     ifstream sensor_file;
     thread temperature_reader;
