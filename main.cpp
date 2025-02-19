@@ -96,7 +96,7 @@ int main(){
     sensor_manager.addSensor(&temp_sensor2);
     sensor_manager.addSensor(&temp_sensor3);
 
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "TempSensors", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "Temperature Sensors GUI", nullptr, nullptr);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
     IMGUI_CHECKVERSION();
@@ -106,8 +106,8 @@ int main(){
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsLight();
+//    ImGui::StyleColorsDark();
+    ImGui::StyleColorsLight();
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -185,8 +185,8 @@ int main(){
                 //temp_sensor1.stop_temp_reading_thread();
                 //temp_sensor2.stop_temp_reading_thread();
                 //temp_sensor3.stop_temp_reading_thread();
-                database.stop_write_thread();
                 sensor_manager.stopAll();
+                database.stop_write_thread();
             }
             ImGui::Spacing();
             ImGui::Spacing();

@@ -44,7 +44,7 @@ void TemperatureSensor::read_temperature() {
         auto t_c = static_cast<time_t>(timestamp);
 
         lock_guard<mutex> temp_lock(temp_mutex);
-        float temp = get_temperature();
+        temp = get_temperature();
 
         if (temp == -1) {
             cerr << "Error: Failed to read temperature from: " << name << endl;
@@ -82,8 +82,7 @@ float TemperatureSensor::get_temperature() {
     sensor_file.seekg(0, ios::beg);
 
     if (!temp_data.empty()) {
-        temp = stoi(temp_data) / 1000.0;
-        return temp;
+        return stoi(temp_data) / 1000.0;
     }
 
     return -1;
