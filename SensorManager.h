@@ -4,7 +4,12 @@
 
 #ifndef DATASTRUCTUREALGORITHMSPROJECT_SENSORMANAGER_H
 #define DATASTRUCTUREALGORITHMSPROJECT_SENSORMANAGER_H
-#include "TemperatureSensor.h"
+
+#include <vector>
+#include <mutex>
+#include <condition_variable>
+
+class TemperatureSensor;
 
 using namespace std;
 

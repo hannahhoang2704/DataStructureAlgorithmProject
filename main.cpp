@@ -87,17 +87,16 @@ int main(){
     DatabaseStorage database(json_file_path, queue_manager);
     SensorManager sensor_manager;
 //    database.start_write_thread();
-    TemperatureSensor temp_sensor1("sensor1", sensorDirs[0], queue_manager, 4, false);
-    TemperatureSensor temp_sensor2("sensor1", sensorDirs[1], queue_manager, 4, false);
-    TemperatureSensor temp_sensor3("sensor3", sensorDirs[2], queue_manager, 4, false);
+    TemperatureSensor temp_sensor1("sensor1", sensorDirs[0], queue_manager, 4);
+    TemperatureSensor temp_sensor2("sensor1", sensorDirs[1], queue_manager, 4);
+    TemperatureSensor temp_sensor3("sensor3", sensorDirs[2], queue_manager, 4);
 //    temp_sensor1.start_temp_reading_thread();
 //    temp_sensor2.start_temp_reading_thread();
 //    temp_sensor3.start_temp_reading_thread();
 
-    sensor_manager.add_sensor(&temp_sensor1);
-    sensor_manager.add_sensor(&temp_sensor2);
-    sensor_manager.add_sensor(&temp_sensor3);
-    sensor_manager.startAll();
+    sensor_manager.addSensor(&temp_sensor1);
+    sensor_manager.addSensor(&temp_sensor2);
+    sensor_manager.addSensor(&temp_sensor3);
 
     GLFWwindow* window = glfwCreateWindow(1280, 720, "TempSensors", nullptr, nullptr);
     glfwMakeContextCurrent(window);
@@ -182,9 +181,10 @@ int main(){
             if (ImGui::Button("Start Measure", button_size)) {
                 counter++;
                 database.start_write_thread();
-                temp_sensor1.start_temp_reading_thread();
-                temp_sensor2.start_temp_reading_thread();
-                temp_sensor3.start_temp_reading_thread();
+                sensor_manager.startAll();
+                //temp_sensor1.start_temp_reading_thread();
+                //temp_sensor2.start_temp_reading_thread();
+                //temp_sensor3.start_temp_reading_thread();
             }                           // Buttons return true when clicked (most widgets return true when edited/activated)
 
             ImGui::SameLine();
@@ -192,9 +192,10 @@ int main(){
             if (ImGui::Button("Stop Measure", button_size))                            // Buttons return true when clicked (most widgets return true when edited/activated)
             {
                 counter--;
-                temp_sensor1.stop_temp_reading_thread();
-                temp_sensor2.stop_temp_reading_thread();
-                temp_sensor3.stop_temp_reading_thread();
+                sensor_manager.stopAll();
+                //temp_sensor1.stop_temp_reading_thread();
+                //temp_sensor2.stop_temp_reading_thread();
+                //temp_sensor3.stop_temp_reading_thread();
                 database.stop_write_thread();
             }
             ImGui::Spacing();

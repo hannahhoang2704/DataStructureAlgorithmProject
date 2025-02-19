@@ -2,6 +2,8 @@
 // Created by Hanh Hoang on 7.2.2025.
 //
 
+#include "TemperatureSensor.h"
+
 #define SENSORS_PATH "/sys/bus/w1/devices/"
 
 void TemperatureSensor::openFile() {

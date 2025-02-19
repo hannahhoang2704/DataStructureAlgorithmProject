@@ -13,10 +13,10 @@
 #include <ctime>
 #include <iomanip>
 #include <fstream>
+#include <atomic>
 #include "InfoNode.h"
 #include "QueueManager.h"
 #include "SensorManager.h"
-#include "TemperatureSensor.h"
 #include "InfoNode.h"
 
 using namespace std;
