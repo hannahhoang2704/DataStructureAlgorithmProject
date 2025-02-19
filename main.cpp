@@ -180,8 +180,8 @@ int main(){
             ImVec2 button_size(200, 50);
             if (ImGui::Button("Start Measure", button_size)) {
                 counter++;
-                database.start_write_thread();
                 sensor_manager.startAll();
+                database.start_write_thread();
                 //temp_sensor1.start_temp_reading_thread();
                 //temp_sensor2.start_temp_reading_thread();
                 //temp_sensor3.start_temp_reading_thread();
@@ -192,11 +192,11 @@ int main(){
             if (ImGui::Button("Stop Measure", button_size))                            // Buttons return true when clicked (most widgets return true when edited/activated)
             {
                 counter--;
-                sensor_manager.stopAll();
                 //temp_sensor1.stop_temp_reading_thread();
                 //temp_sensor2.stop_temp_reading_thread();
                 //temp_sensor3.stop_temp_reading_thread();
                 database.stop_write_thread();
+                sensor_manager.stopAll();
             }
             ImGui::Spacing();
             ImGui::Spacing();
