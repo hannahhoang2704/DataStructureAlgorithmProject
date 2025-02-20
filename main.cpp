@@ -88,9 +88,9 @@ int main(){
     DatabaseStorage database(json_file_path, queue_manager);
     SensorManager sensor_manager;
 
-    TemperatureSensor temp_sensor1("sensor1", sensorDirs[0], queue_manager, 4);
-    TemperatureSensor temp_sensor2("sensor2", sensorDirs[1], queue_manager, 4);
-    TemperatureSensor temp_sensor3("sensor3", sensorDirs[2], queue_manager, 4);
+    TemperatureSensor temp_sensor1("sensor1", sensorDirs[0], queue_manager, 3);
+    TemperatureSensor temp_sensor2("sensor2", sensorDirs[1], queue_manager, 5);
+    TemperatureSensor temp_sensor3("sensor3", sensorDirs[2], queue_manager, 3);
 
     sensor_manager.addSensor(&temp_sensor1);
     sensor_manager.addSensor(&temp_sensor2);
