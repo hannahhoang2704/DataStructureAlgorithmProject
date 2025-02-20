@@ -16,6 +16,7 @@
 #include "QueueManager.h"
 #include "DatabaseStorage.h"
 #include "InfoNode.h"
+#include "Observer.h"
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
@@ -74,15 +75,14 @@ int main(){
 #endif
 
 
+    float temp1=0.0, temp2=0.0, temp3=0.0;
     QueueManager queue_manager;
     DatabaseStorage database(json_file_path, queue_manager);
-//    database.start_write_thread();
     TemperatureSensor temp_sensor1("sensor1", 0,  queue_manager, 3);
     TemperatureSensor temp_sensor2("sensor2",1, queue_manager);
     TemperatureSensor temp_sensor3("sensor3",1, queue_manager, 4);
-//    temp_sensor1.start_temp_reading_thread();
-//    temp_sensor2.start_temp_reading_thread();
-//    temp_sensor3.start_temp_reading_thread();
+    UIObserver gui_observer(temp1, temp2, temp3);
+    queue_manager.add_observer(&gui_observer);
 
     GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
     glfwMakeContextCurrent(window);
@@ -173,18 +173,18 @@ int main(){
             }
 
 
-            // Get latest temperature readings
-            int temp1 = temp_sensor1.get_temperature();
-            int temp2 = temp_sensor2.get_temperature();
-            int temp3 = temp_sensor3.get_temperature();
+//            // Get latest temperature readings
+//            float temp1 = temp_sensor1.get_temperature();
+//            float temp2 = temp_sensor2.get_temperature();
+//            float temp3 = temp_sensor3.get_temperature();
 
-            ImGui::Text("Sensor 1:  %d°C", temp1);
-            ImGui::Text("Sensor 2:  %d°C", temp2);
-            ImGui::Text("Sensor 3:  %d°C", temp3);
+            ImGui::Text("Sensor 1:  %f°C", temp1);
+            ImGui::Text("Sensor 2:  %f°C", temp2);
+            ImGui::Text("Sensor 3:  %f°C", temp3);
 
             // Update circular buffers with new readings
-            temp_values1[temp_offset] = static_cast<float>(temp1);
-            temp_values2[temp_offset] = static_cast<float>(temp2);
+            temp_values1[temp_offset] = temp1;
+            temp_values2[temp_offset] =temp2;
             temp_values3[temp_offset] = static_cast<float>(temp3);
             temp_offset = (temp_offset + 1) % IM_ARRAYSIZE(temp_values1);
 

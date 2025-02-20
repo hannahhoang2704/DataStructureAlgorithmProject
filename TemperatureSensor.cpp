@@ -24,7 +24,8 @@ void TemperatureSensor::read_temperature() {
     while(!terminated){
         uint64_t timestamp = chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch()).count();
         auto t_c = static_cast<time_t>(timestamp);
-        read_sensor();
+        lock_guard<mutex> temp_lock(temp_mutex);
+        temp = read_sensor();
         InfoNode node(name, timestamp, temp);
         cout << "[" << put_time(localtime(&t_c), "%Y-%m-%d %H:%M:%S") << "]\t" << name << ": " << temp <<  " degree"<< endl;
         queue_manager.push_back(node);
@@ -32,10 +33,11 @@ void TemperatureSensor::read_temperature() {
     }
 }
 
-int TemperatureSensor::get_temperature() {
+float TemperatureSensor::get_temperature() {
+    lock_guard<mutex> temp_lock(temp_mutex);
     return temp;
 }
 
-int TemperatureSensor::read_sensor(){
-    return temp++; //replace this temp simulator
+float TemperatureSensor::read_sensor(){
+    return temp += 1.0;
 }

@@ -21,7 +21,7 @@ public:
     ~TemperatureSensor();
     void start_temp_reading_thread();
     void stop_temp_reading_thread();
-    int get_temperature();
+    float get_temperature();
 private:
     const string name;
     uint32_t gpio;
@@ -29,9 +29,10 @@ private:
     int interval;
     bool terminated = false;
     thread temperature_reader;
+    mutex temp_mutex;
     QueueManager & queue_manager;
     void read_temperature();
-    int read_sensor();
+    float read_sensor();
 };
 
 

@@ -7,8 +7,10 @@
 #include <deque>
 #include <iostream>
 #include <mutex>
+#include <vector>
 #include <condition_variable>
 #include "InfoNode.h"
+#include "Observer.h"
 
 using namespace std;
 class QueueManager{
@@ -16,10 +18,11 @@ public:
     QueueManager();
     void push_back(InfoNode& node);
     bool pop_data(InfoNode &node);
+    void add_observer(Observer* observer);
 private:
     deque<InfoNode> node_queue;
     mutex queue_mutex;
     condition_variable data_available;
-
+    vector<Observer*> observers;
 };
 #endif //DATASTRUCTUREALGORITHMSPROJECT_QUEUEMANAGER_H
