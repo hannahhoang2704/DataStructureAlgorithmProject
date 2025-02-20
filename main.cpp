@@ -1,20 +1,20 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <nlohmann/json.hpp>
+#include <stdio.h>
 #include <map>
 
-//#include <SDL2/SDL.h>
+#include <nlohmann/json.hpp>
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include <stdio.h>
-//#include <GL/glew.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
 #include <GLFW/glfw3.h>
 
+#include "Observer.h"
 #include "TemperatureSensor.h"
 #include "QueueManager.h"
 #include "DatabaseStorage.h"
@@ -77,7 +77,7 @@ int main(){
     //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
-
+    float temp1=0.0, temp2=0.0, temp3=0.0;
     vector<string> sensorDirs {
         "28-00000087fb7c",
         "28-00000085e6ff",
@@ -95,6 +95,9 @@ int main(){
     sensor_manager.addSensor(&temp_sensor1);
     sensor_manager.addSensor(&temp_sensor2);
     sensor_manager.addSensor(&temp_sensor3);
+
+    UIObserver gui_observer(temp1, temp2, temp3);
+    queue_manager.add_observer(&gui_observer);
 
     GLFWwindow* window = glfwCreateWindow(1280, 720, "Temperature Sensors GUI", nullptr, nullptr);
     glfwMakeContextCurrent(window);
@@ -192,13 +195,13 @@ int main(){
             ImGui::Spacing();
             ImGui::Spacing();
 
-            float temp1 = temp_sensor1.temperature_getter();
-            float temp2 = temp_sensor2.temperature_getter();
-            float temp3 = temp_sensor3.temperature_getter();
+//            float temp1 = temp_sensor1.temperature_getter();
+//            float temp2 = temp_sensor2.temperature_getter();
+//            float temp3 = temp_sensor3.temperature_getter();
 
-            ImGui::Text("Sensor 1:  %f°C", temp1);
-            ImGui::Text("Sensor 2:  %f°C", temp2);
-            ImGui::Text("Sensor 3:  %f°C", temp3);
+            ImGui::Text("Sensor 1:  %.2f°C", temp1);
+            ImGui::Text("Sensor 2:  %.2f°C", temp2);
+            ImGui::Text("Sensor 3:  %.2f°C", temp3);
 
             // Update circular buffers with new readings
             temp_values1[temp_offset] = temp1;

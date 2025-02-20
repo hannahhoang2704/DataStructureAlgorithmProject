@@ -57,6 +57,7 @@ add_executable(DataStructureAlgorithmsProject
         imgui/backends/imgui_impl_opengl3.cpp
         SensorManager.h
         SensorManager.cpp
+        Observer.h
 )
 
 target_include_directories(DataStructureAlgorithmsProject PRIVATE /usr/local/include)
