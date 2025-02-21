@@ -35,6 +35,16 @@ set(IMGUI_HEADERS
         imgui/backends/imgui_impl_opengl3.h
 )
 
+set(IMGUI_SRC
+        imgui/imgui.cpp
+        imgui/imgui_draw.cpp
+        imgui/imgui_tables.cpp
+        imgui/imgui_widgets.cpp
+        imgui/imgui_demo.cpp
+        imgui/backends/imgui_impl_glfw.cpp
+        imgui/backends/imgui_impl_opengl3.cpp
+)
+
 # Create ImGui as a static library
 add_library(imgui STATIC ${IMGUI_SRC})
 
@@ -53,8 +63,6 @@ add_executable(DataStructureAlgorithmsProject
         QueueManager.cpp
         DatabaseStorage.cpp
         DatabaseStorage.h
-        imgui/backends/imgui_impl_sdl2.cpp
-        imgui/backends/imgui_impl_opengl3.cpp
         SensorManager.h
         SensorManager.cpp
         Observer.h

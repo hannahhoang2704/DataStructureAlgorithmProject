@@ -3,6 +3,9 @@
 //
 
 #include "GUIManager.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 #include <iostream>
 
 GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, float& t1, float& t2, float& t3)
@@ -63,9 +66,6 @@ void GUIManager::initialize_gui() {
     ImGui::StyleColorsLight();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
-
-    // Initialize ImPlot context
-    ImPlot::CreateContext();
 }
 
 void GUIManager::render() {
@@ -124,15 +124,27 @@ void GUIManager::renderRealTimeValues() {
 void GUIManager::renderPlots() {
     ImGui::Begin("Sensor Data");
 
-    if (ImPlot::BeginPlot("Combined Graph", "Time", "Temperature (°C)", ImVec2(600, 300))) {
-        if (!values1.empty()) ImPlot::PlotLine("Sensor 1", time1.data(), values1.data(), time1.size());
-        if (!values2.empty()) ImPlot::PlotLine("Sensor 2", time2.data(), values2.data(), time2.size());
-        if (!values3.empty()) ImPlot::PlotLine("Sensor 3", time3.data(), values3.data(), time3.size());
-        ImPlot::EndPlot();
+    // Plot Sensor 1
+    if (!values1.empty()) {
+        ImGui::Text("Sensor 1");
+        ImGui::PlotLines("Temp 1", values1.data(), static_cast<int>(values1.size()), 0, nullptr, -5.0f, 50.0f, ImVec2(0, 100));
+    }
+
+    // Plot Sensor 2
+    if (!values2.empty()) {
+        ImGui::Text("Sensor 2");
+        ImGui::PlotLines("Temp 2", values2.data(), static_cast<int>(values2.size()), 0, nullptr, -5.0f, 50.0f, ImVec2(0, 100));
+    }
+
+    // Plot Sensor 3
+    if (!values3.empty()) {
+        ImGui::Text("Sensor 3");
+        ImGui::PlotLines("Temp 3", values3.data(), static_cast<int>(values3.size()), 0, nullptr, -5.0f, 50.0f, ImVec2(0, 100));
     }
 
     ImGui::End();
 }
+
 
 void GUIManager::handleStartMeasurement() {
     // Start measurements
@@ -165,17 +177,18 @@ void GUIManager::updatePlotData() {
 }
 
 void GUIManager::cleanup_gui() {
-    ImPlot::DestroyContext();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
     if (window) {
         glfwDestroyWindow(window);
+        glfwTerminate();
+        window = nullptr;
     }
-    glfwTerminate();
 }
 
 GLFWwindow* GUIManager::getWindow() const {
     return window;
 }
+
