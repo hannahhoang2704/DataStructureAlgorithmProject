@@ -126,20 +126,35 @@ void GUIManager::renderPlots() {
 
     // Plot Sensor 1
     if (!values1.empty()) {
+        float min1 = *std::min_element(values1.begin(), values1.end());
+        float max1 = *std::max_element(values1.begin(), values1.end());
+        max1 += 1.0f;  // Add a small buffer to make the graph more readable
+        min1 -= 1.0f;
+
         ImGui::Text("Sensor 1");
-        ImGui::PlotLines("Temp 1", values1.data(), static_cast<int>(values1.size()), 0, nullptr, -5.0f, 50.0f, ImVec2(0, 100));
+        ImGui::PlotLines("Temp 1", values1.data(), static_cast<int>(values1.size()), 0, nullptr, min1, max1, ImVec2(0, 200));
     }
 
     // Plot Sensor 2
     if (!values2.empty()) {
+        float min2 = *std::min_element(values2.begin(), values2.end());
+        float max2 = *std::max_element(values2.begin(), values2.end());
+        max2 += 1.0f;
+        min2 -= 1.0f;
+
         ImGui::Text("Sensor 2");
-        ImGui::PlotLines("Temp 2", values2.data(), static_cast<int>(values2.size()), 0, nullptr, -5.0f, 50.0f, ImVec2(0, 100));
+        ImGui::PlotLines("Temp 2", values2.data(), static_cast<int>(values2.size()), 0, nullptr, min2, max2, ImVec2(0, 200));
     }
 
     // Plot Sensor 3
     if (!values3.empty()) {
+        float min3 = *std::min_element(values3.begin(), values3.end());
+        float max3 = *std::max_element(values3.begin(), values3.end());
+        max3 += 1.0f;
+        min3 -= 1.0f;
+
         ImGui::Text("Sensor 3");
-        ImGui::PlotLines("Temp 3", values3.data(), static_cast<int>(values3.size()), 0, nullptr, -5.0f, 50.0f, ImVec2(0, 100));
+        ImGui::PlotLines("Temp 3", values3.data(), static_cast<int>(values3.size()), 0, nullptr, min3, max3, ImVec2(0, 200));
     }
 
     ImGui::End();
