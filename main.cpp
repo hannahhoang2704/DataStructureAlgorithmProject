@@ -190,6 +190,17 @@ int main(){
                 //temp_sensor2.stop_temp_reading_thread();
                 //temp_sensor3.stop_temp_reading_thread();
                 sensor_manager.stopAll();
+
+                auto [timestamps, values] = database.read_database();
+                // Print out the parsed data to test
+                for (const auto& [sensorName, tsVector] : timestamps) {
+                    cout << "Sensor: " << sensorName << endl;
+                    for (size_t i = 0; i < tsVector.size(); ++i) {
+                        cout << "  Timestamp: " << tsVector[i]
+                             << " -> Value: " << values[sensorName][i] << endl;
+                    }
+                }
+
             }
             ImGui::Spacing();
             ImGui::Spacing();

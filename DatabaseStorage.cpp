@@ -46,7 +46,7 @@ void DatabaseStorage::stop_write_thread() {
     if(database_writer.joinable()) database_writer.join();
 }
 
-json DatabaseStorage::read_database() {
+/*json DatabaseStorage::read_database() {
     lock_guard<mutex> lock(file_lock);
     ifstream read_file(file_path);
     json j;
@@ -63,4 +63,41 @@ json DatabaseStorage::read_database() {
         cerr << "Can't open " << file_path << " to read data" << endl;
         return json{};
     }
+}*/
+
+pair<map<string, vector<uint64_t>>, map<string, vector<float>>> DatabaseStorage::read_database() {
+    lock_guard<mutex> lock(file_lock);
+    map<string, vector<uint64_t>> sensorTimestamps;
+    map<string, vector<float>> sensorValues;
+
+    ifstream read_file(file_path);
+    json j;
+    if (read_file.is_open()) {
+        try {
+            read_file >> j;
+            for (auto& sensor : j.items()) {
+                const string& sensorName = sensor.key();  // get the sensor name
+                auto& entries = sensor.value();          // get the array of [timestamp, value]
+
+                // Iterate through the array of [timestamp, value]
+                for (auto& entry : entries) {
+                    if (entry.is_array() && entry.size() == 2) {
+                        uint64_t timestamp = entry[0].get<uint64_t>();
+                        float value = entry[1].get<float>();
+                        sensorTimestamps[sensorName].push_back(timestamp);
+                        sensorValues[sensorName].push_back(value);
+                    } else {
+                        cerr << "Invalid entry format in JSON for sensor " << sensorName << endl;
+                    }
+                }
+            }
+            read_file.close();
+        } catch (const std::exception& e) {
+            std::cerr << "Error reading or parsing JSON: " << e.what() << std::endl;
+        }
+    } else {
+        cerr << "Can't open " << file_path << " to read data" << endl;
+    }
+
+    return {sensorTimestamps, sensorValues};
 }
