@@ -58,6 +58,8 @@ add_executable(DataStructureAlgorithmsProject
         SensorManager.h
         SensorManager.cpp
         Observer.h
+        GUIManager.h
+        GUIManager.cpp
 )
 
 target_include_directories(DataStructureAlgorithmsProject PRIVATE /usr/local/include)
