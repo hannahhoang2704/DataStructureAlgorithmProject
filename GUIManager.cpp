@@ -168,7 +168,7 @@ void GUIManager::handleStartMeasurement() {
     showGraph = false;
 
     database.start_write_thread();
-    sensorManager.startAllSensors();
+    sensorManager.startAll();
 }
 
 void GUIManager::handleStopMeasurement() {
@@ -177,8 +177,5 @@ void GUIManager::handleStopMeasurement() {
     showGraph = true;
 
     database.stop_write_thread();
-    sensorManager.stopAllSensors();
-
-    // Fetch recorded data for plotting
-    fetchData();
+    sensorManager.stopAll();
 }
