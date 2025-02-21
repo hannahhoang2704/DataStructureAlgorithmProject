@@ -9,7 +9,6 @@
 #include <string>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
-#include <implot.h>
 #include "DatabaseStorage.h"
 #include "SensorManager.h"
 #include "QueueManager.h"
