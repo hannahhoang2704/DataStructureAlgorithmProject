@@ -214,7 +214,6 @@ int main(){
                 return std::accumulate(values, values + IM_ARRAYSIZE(temp_values1), 0.0f) / IM_ARRAYSIZE(temp_values1);
             };
 
-            /*
             ImVec2 plot_size(600, 100);
 
             // Plot Sensor 1 Graph
@@ -231,7 +230,6 @@ int main(){
             char overlay3[32];
             sprintf(overlay3, "Avg: %.2f°C", calc_avg(temp_values3));
             ImGui::PlotLines("Sensor 3 Temperature", temp_values3, IM_ARRAYSIZE(temp_values3), temp_offset, overlay3, 0.0f, 100.0f, plot_size);
-            */
 
             ImGui::End();
         }
