@@ -7,6 +7,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <iostream>
+#include <algorithm>
 
 GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, float& t1, float& t2, float& t3)
         : database(db), sensorManager(sm), queueManager(qm),
@@ -69,37 +70,15 @@ void GUIManager::initialize_gui() {
 }
 
 void GUIManager::render() {
-    // Start new ImGui frame
+    // Start a new ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    // Render real-time values if measuring
-    if (isMeasuring) {
-        renderRealTimeValues();
-    }
+    // Render everything in a single window
+    ImGui::Begin("Temperature Sensors GUI"); // Start main GUI window
 
-    // Render Start/Stop controls
-    renderControls();
-
-    // Render plots after stopping measurements
-    if (showGraph) {
-        renderPlots();
-    }
-
-    // Render GUI
-    ImGui::Render();
-    glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    // Swap buffers
-    glfwSwapBuffers(window);
-}
-
-void GUIManager::renderControls() {
-    ImGui::Begin("Measurement Controls");
-
+    // Render controls (start/stop measurement button)
     if (!isMeasuring) {
         if (ImGui::Button("Start Measurement")) {
             handleStartMeasurement();
@@ -110,100 +89,96 @@ void GUIManager::renderControls() {
         }
     }
 
-    ImGui::End();
-}
+    ImGui::Separator();
 
-void GUIManager::renderRealTimeValues() {
-    ImGui::Begin("Real-Time Sensor Values");
+    // Render real-time sensor values
+    ImGui::Text("Real-Time Sensor Values:");
     ImGui::Text("Sensor 1: %.2f °C", temp1);
     ImGui::Text("Sensor 2: %.2f °C", temp2);
     ImGui::Text("Sensor 3: %.2f °C", temp3);
-    ImGui::End();
-}
 
-void GUIManager::renderPlots() {
-    ImGui::Begin("Sensor Data");
+    ImGui::Separator();
 
-    // Plot Sensor 1
-    if (!values1.empty()) {
-        float min1 = *std::min_element(values1.begin(), values1.end());
-        float max1 = *std::max_element(values1.begin(), values1.end());
-        max1 += 1.0f;  // Add a small buffer to make the graph more readable
-        min1 -= 1.0f;
+    // Render plots if the graph should be shown
+    if (showGraph) {
+        ImGui::Text("Sensor Data Plots:");
 
-        ImGui::Text("Sensor 1");
-        ImGui::PlotLines("Temp 1", values1.data(), static_cast<int>(values1.size()), 0, nullptr, min1, max1, ImVec2(0, 200));
+        // Sensor 1 Plot
+        if (!values1.empty()) {
+            float min1 = *std::min_element(values1.begin(), values1.end());
+            float max1 = *std::max_element(values1.begin(), values1.end());
+            max1 += 1.0f; // Add a small buffer to the max
+            min1 -= 1.0f; // Add a small buffer to the min
+
+            ImGui::Text("Sensor 1");
+            ImGui::PlotLines("##Sensor1", values1.data(), static_cast<int>(values1.size()), 0, nullptr, min1, max1, ImVec2(0, 150));
+        }
+
+        // Sensor 2 Plot
+        if (!values2.empty()) {
+            float min2 = *std::min_element(values2.begin(), values2.end());
+            float max2 = *std::max_element(values2.begin(), values2.end());
+            max2 += 1.0f;
+            min2 -= 1.0f;
+
+            ImGui::Text("Sensor 2");
+            ImGui::PlotLines("##Sensor2", values2.data(), static_cast<int>(values2.size()), 0, nullptr, min2, max2, ImVec2(0, 150));
+        }
+
+        // Sensor 3 Plot
+        if (!values3.empty()) {
+            float min3 = *std::min_element(values3.begin(), values3.end());
+            float max3 = *std::max_element(values3.begin(), values3.end());
+            max3 += 1.0f;
+            min3 -= 1.0f;
+
+            ImGui::Text("Sensor 3");
+            ImGui::PlotLines("##Sensor3", values3.data(), static_cast<int>(values3.size()), 0, nullptr, min3, max3, ImVec2(0, 150));
+        }
     }
 
-    // Plot Sensor 2
-    if (!values2.empty()) {
-        float min2 = *std::min_element(values2.begin(), values2.end());
-        float max2 = *std::max_element(values2.begin(), values2.end());
-        max2 += 1.0f;
-        min2 -= 1.0f;
+    ImGui::End(); // End the main GUI window
 
-        ImGui::Text("Sensor 2");
-        ImGui::PlotLines("Temp 2", values2.data(), static_cast<int>(values2.size()), 0, nullptr, min2, max2, ImVec2(0, 200));
-    }
+    // Render and display the ImGui content
+    ImGui::Render();
+    glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    // Plot Sensor 3
-    if (!values3.empty()) {
-        float min3 = *std::min_element(values3.begin(), values3.end());
-        float max3 = *std::max_element(values3.begin(), values3.end());
-        max3 += 1.0f;
-        min3 -= 1.0f;
-
-        ImGui::Text("Sensor 3");
-        ImGui::PlotLines("Temp 3", values3.data(), static_cast<int>(values3.size()), 0, nullptr, min3, max3, ImVec2(0, 200));
-    }
-
-    ImGui::End();
-}
-
-
-void GUIManager::handleStartMeasurement() {
-    // Start measurements
-    sensorManager.startAll();
-    database.start_write_thread();
-
-    // Update state
-    isMeasuring = true;
-    showGraph = false;
-}
-
-void GUIManager::handleStopMeasurement() {
-    // Stop measurements
-    sensorManager.stopAll();
-    database.stop_write_thread();
-
-    // Update plot data and state
-    updatePlotData();
-    isMeasuring = false;
-    showGraph = true;
-}
-
-void GUIManager::updatePlotData() {
-    auto [timestamps, values] = database.read_database();
-
-    // Prepare data for plotting
-    database.preparePlotData("sensor1", timestamps, values, time1, values1);
-    database.preparePlotData("sensor2", timestamps, values, time2, values2);
-    database.preparePlotData("sensor3", timestamps, values, time3, values3);
+    // Swap buffers
+    glfwSwapBuffers(window);
 }
 
 void GUIManager::cleanup_gui() {
+    // Clean up ImGui
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
+    // Clean up GLFW
     if (window) {
         glfwDestroyWindow(window);
-        glfwTerminate();
-        window = nullptr;
     }
+    glfwTerminate();
 }
 
-GLFWwindow* GUIManager::getWindow() const {
-    return window;
+void GUIManager::handleStartMeasurement() {
+    // Start the measurement process
+    isMeasuring = true;
+    showGraph = false;
+
+    database.start_write_thread();
+    sensorManager.startAllSensors();
 }
 
+void GUIManager::handleStopMeasurement() {
+    // Stop the measurement process
+    isMeasuring = false;
+    showGraph = true;
+
+    database.stop_write_thread();
+    sensorManager.stopAllSensors();
+
+    // Fetch recorded data for plotting
+    fetchData();
+}
