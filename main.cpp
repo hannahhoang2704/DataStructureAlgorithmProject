@@ -1,4 +1,4 @@
-#include <iostream>
+/*#include <iostream>
 #include <fstream>
 #include <vector>
 #include <stdio.h>
@@ -19,8 +19,47 @@
 #include "QueueManager.h"
 #include "DatabaseStorage.h"
 #include "InfoNode.h"
-#include "SensorManager.h"
+#include "SensorManager.h"*/
 
+#include "QueueManager.h"
+#include "DatabaseStorage.h"
+#include "SensorManager.h"
+#include "GUIManager.h"
+#include "TemperatureSensor.h"
+
+int main() {
+    try {
+        // Initialize real-time temperature variables
+        float temp1 = 0.0f, temp2 = 0.0f, temp3 = 0.0f;
+
+        // Paths and initialization
+        std::string json_file_path = "/home/andrea/Documents/projects/DataStructureAlgorithmProject/database/database.json"; // path on raspberry
+        QueueManager queue_manager;
+        DatabaseStorage database(json_file_path, queue_manager);
+        SensorManager sensor_manager;
+
+        // Add sensors
+        sensor_manager.addSensor(new TemperatureSensor("sensor1", "28-00000087fb7c", queue_manager));
+        sensor_manager.addSensor(new TemperatureSensor("sensor2", "28-00000085e6ff", queue_manager));
+        sensor_manager.addSensor(new TemperatureSensor("sensor3", "28-000000849be2", queue_manager));
+
+        // Initialize GUIManager with references to temp1, temp2, and temp3
+        GUIManager gui_manager(database, sensor_manager, queue_manager, temp1, temp2, temp3);
+        gui_manager.initialize_gui();
+
+        // Main loop
+        while (!glfwWindowShouldClose(gui_manager.window)) {
+            glfwPollEvents();
+            gui_manager.render();
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+/*
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
 // Your own project should not be affected, as you are likely to link with a newer binary of GLFW that is adequate for your version of Visual Studio.
@@ -225,7 +264,7 @@ int main(){
                 return std::accumulate(values, values + IM_ARRAYSIZE(temp_values1), 0.0f) / IM_ARRAYSIZE(temp_values1);
             };
 
-            /*
+
             ImVec2 plot_size(600, 100);
 
             // Plot Sensor 1 Graph
@@ -242,7 +281,7 @@ int main(){
             char overlay3[32];
             sprintf(overlay3, "Avg: %.2f°C", calc_avg(temp_values3));
             ImGui::PlotLines("Sensor 3 Temperature", temp_values3, IM_ARRAYSIZE(temp_values3), temp_offset, overlay3, 0.0f, 100.0f, plot_size);
-            */
+
 
             ImGui::End();
         }
@@ -268,7 +307,7 @@ int main(){
     glfwTerminate();
 
     return EXIT_SUCCESS;
-}
+}*/
 //    this_thread::sleep_for(chrono::seconds(15));
 
 
