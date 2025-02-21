@@ -179,3 +179,7 @@ void GUIManager::handleStopMeasurement() {
     database.stop_write_thread();
     sensorManager.stopAll();
 }
+
+GLFWwindow* GUIManager::getWindow() const {
+    return window; // Return the GLFW window pointer
+}
