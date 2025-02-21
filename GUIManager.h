@@ -50,6 +50,7 @@ public:
     void handleStopMeasurement();     // Stop collecting sensor measurements and generates graphs
     void render();                    // Render the GUI every frame
     void cleanup_gui();               // Cleanup ImGui and other resources
+    GLFWwindow* getWindow() const;
 };
 
 #endif // GUIMANAGER_H

@@ -48,7 +48,7 @@ int main() {
         gui_manager.initialize_gui();
 
         // Main loop
-        while (!glfwWindowShouldClose(gui_manager.window)) {
+        while (!glfwWindowShouldClose(gui_manager.getWindow())) {
             glfwPollEvents();
             gui_manager.render();
         }

@@ -175,3 +175,7 @@ void GUIManager::cleanup_gui() {
     }
     glfwTerminate();
 }
+
+GLFWwindow* GUIManager::getWindow() const {
+    return window;
+}
