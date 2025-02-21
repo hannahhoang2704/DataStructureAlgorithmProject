@@ -39,9 +39,9 @@ int main() {
         SensorManager sensor_manager;
 
         // Add sensors
-        sensor_manager.addSensor(new TemperatureSensor("sensor1", "28-00000087fb7c", queue_manager));
-        sensor_manager.addSensor(new TemperatureSensor("sensor2", "28-00000085e6ff", queue_manager));
-        sensor_manager.addSensor(new TemperatureSensor("sensor3", "28-000000849be2", queue_manager));
+        sensor_manager.addSensor(new TemperatureSensor("sensor1", "28-00000087fb7c", queue_manager, 2));
+        sensor_manager.addSensor(new TemperatureSensor("sensor2", "28-00000085e6ff", queue_manager, 3));
+        sensor_manager.addSensor(new TemperatureSensor("sensor3", "28-000000849be2", queue_manager,2));
 
         // Initialize GUIManager with references to temp1, temp2, and temp3
         GUIManager gui_manager(database, sensor_manager, queue_manager, temp1, temp2, temp3);

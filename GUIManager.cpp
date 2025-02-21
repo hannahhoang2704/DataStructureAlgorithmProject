@@ -105,7 +105,6 @@ void GUIManager::renderControls() {
             handleStartMeasurement();
         }
     } else {
-        ImGui::SameLine();
         if (ImGui::Button("Stop Measurement")) {
             handleStopMeasurement();
         }
@@ -125,28 +124,37 @@ void GUIManager::renderRealTimeValues() {
 void GUIManager::renderPlots() {
     ImGui::Begin("Sensor Data");
 
+    // Plot Sensor 1
     if (!values1.empty()) {
-        // Determine min and max for the y-axis (temperature)
         float min1 = *std::min_element(values1.begin(), values1.end());
         float max1 = *std::max_element(values1.begin(), values1.end());
-        max1 += 1.0f;
+        max1 += 1.0f;  // Add a small buffer to make the graph more readable
         min1 -= 1.0f;
 
-        // Example: Only show the last 100 points
-        int start = std::max(0, static_cast<int>(values1.size()) - 100);
-        int plot_size = std::min(100, static_cast<int>(values1.size()));
+        ImGui::Text("Sensor 1");
+        ImGui::PlotLines("Temp 1", values1.data(), static_cast<int>(values1.size()), 0, nullptr, min1, max1, ImVec2(0, 200));
+    }
 
-        ImGui::Text("Sensor 1: Temperature Data");
+    // Plot Sensor 2
+    if (!values2.empty()) {
+        float min2 = *std::min_element(values2.begin(), values2.end());
+        float max2 = *std::max_element(values2.begin(), values2.end());
+        max2 += 1.0f;
+        min2 -= 1.0f;
 
-        // Add Y-axis label to the left
-        ImGui::Text("Temp (C)");
-        ImGui::SameLine(); // Keep the next plot on the same row for alignment
+        ImGui::Text("Sensor 2");
+        ImGui::PlotLines("Temp 2", values2.data(), static_cast<int>(values2.size()), 0, nullptr, min2, max2, ImVec2(0, 200));
+    }
 
-        // Draw the plot
-        ImGui::PlotLines("Temp 1", &values1[start], plot_size, 0, nullptr, min1, max1, ImVec2(400, 200));
+    // Plot Sensor 3
+    if (!values3.empty()) {
+        float min3 = *std::min_element(values3.begin(), values3.end());
+        float max3 = *std::max_element(values3.begin(), values3.end());
+        max3 += 1.0f;
+        min3 -= 1.0f;
 
-        // Add X-axis label below
-        ImGui::Text("Time (s)");
+        ImGui::Text("Sensor 3");
+        ImGui::PlotLines("Temp 3", values3.data(), static_cast<int>(values3.size()), 0, nullptr, min3, max3, ImVec2(0, 200));
     }
 
     ImGui::End();
