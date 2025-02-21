@@ -88,9 +88,9 @@ int main(){
     DatabaseStorage database(json_file_path, queue_manager);
     SensorManager sensor_manager;
 
-    TemperatureSensor temp_sensor1("sensor1", sensorDirs[0], queue_manager, 3);
-    TemperatureSensor temp_sensor2("sensor2", sensorDirs[1], queue_manager, 5);
-    TemperatureSensor temp_sensor3("sensor3", sensorDirs[2], queue_manager, 3);
+    TemperatureSensor temp_sensor1("sensor1", sensorDirs[0], queue_manager, 4);
+    TemperatureSensor temp_sensor2("sensor2", sensorDirs[1], queue_manager, 4);
+    TemperatureSensor temp_sensor3("sensor3", sensorDirs[2], queue_manager, 4);
 
     sensor_manager.addSensor(&temp_sensor1);
     sensor_manager.addSensor(&temp_sensor2);
@@ -214,6 +214,7 @@ int main(){
                 return std::accumulate(values, values + IM_ARRAYSIZE(temp_values1), 0.0f) / IM_ARRAYSIZE(temp_values1);
             };
 
+            /*
             ImVec2 plot_size(600, 100);
 
             // Plot Sensor 1 Graph
@@ -230,6 +231,7 @@ int main(){
             char overlay3[32];
             sprintf(overlay3, "Avg: %.2f°C", calc_avg(temp_values3));
             ImGui::PlotLines("Sensor 3 Temperature", temp_values3, IM_ARRAYSIZE(temp_values3), temp_offset, overlay3, 0.0f, 100.0f, plot_size);
+            */
 
             ImGui::End();
         }
