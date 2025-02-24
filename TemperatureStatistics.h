@@ -16,8 +16,8 @@ using namespace std;
 
 class TemperatureStatistics {
 private:
-    map<string, vector<float>> sensorTemperatures;       // Stores temperature values for each sensor
-    map<string, vector<uint64_t>> sensorTimestamps;      // Stores timestamps for each sensor
+    map<string, vector<float>> sensorTemperatures;
+    map<string, vector<uint64_t>> sensorTimestamps;
     DatabaseStorage* databaseStorage;
 
 public:
@@ -25,11 +25,13 @@ public:
     void addSensorData(const string& sensorName, const vector<float>& temps, const vector<uint64_t>& timestamps);
     void loadDataFromDatabase();
     void clearData();
-    pair<float, string> getMinTemperatureWithTimestamp(const string& sensorName) const;
-    pair<float, string> getMaxTemperatureWithTimestamp(const string& sensorName) const;
-    float getMinTemperature() const;
-    float getMaxTemperature() const;
-    float getAverageTemperature(const string& sensorName) const;
+
+    // Removed "const" to allow modification of the object state
+    pair<float, string> getMinTemperatureWithTimestamp(const string& sensorName);
+    pair<float, string> getMaxTemperatureWithTimestamp(const string& sensorName);
+    float getMinTemperature();
+    float getMaxTemperature();
+    float getAverageTemperature(const string& sensorName);
     float getAverageTemperatureAllSensors() const;
 };
 

@@ -29,7 +29,7 @@ void TemperatureStatistics::loadDataFromDatabase() {
     }
 }
 
-pair<float, string> TemperatureStatistics::getMinTemperatureWithTimestamp(const string& sensorName) const {
+pair<float, string> TemperatureStatistics::getMinTemperatureWithTimestamp(const string& sensorName)  {
     loadDataFromDatabase();
 
     auto sensorIt = sensorTemperatures.find(sensorName);
@@ -54,7 +54,7 @@ pair<float, string> TemperatureStatistics::getMinTemperatureWithTimestamp(const 
     }
 }
 
-pair<float, string> TemperatureStatistics::getMaxTemperatureWithTimestamp(const string& sensorName) const {
+pair<float, string> TemperatureStatistics::getMaxTemperatureWithTimestamp(const string& sensorName) {
     loadDataFromDatabase();
 
     auto sensorIt = sensorTemperatures.find(sensorName);
@@ -95,7 +95,7 @@ float TemperatureStatistics::getMinTemperature() const {
     return globalMin;
 }
 
-float TemperatureStatistics::getMaxTemperature() const {
+float TemperatureStatistics::getMaxTemperature() {
     loadDataFromDatabase();
 
     if (sensorTemperatures.empty()) {
@@ -111,7 +111,7 @@ float TemperatureStatistics::getMaxTemperature() const {
     return globalMax;
 }
 
-float TemperatureStatistics::getAverageTemperature(const string& sensorName) const {
+float TemperatureStatistics::getAverageTemperature(const string& sensorName) {
     loadDataFromDatabase();
 
     auto sensorIt = sensorTemperatures.find(sensorName);
@@ -124,7 +124,9 @@ float TemperatureStatistics::getAverageTemperature(const string& sensorName) con
     return sum / temps.size();
 }
 
-float TemperatureStatistics::getAverageTemperatureAllSensors() const {
+float TemperatureStatistics::getAverageTemperatureAllSensors() {
+    loadDataFromDatabase();
+
     if (sensorTemperatures.empty()) {
         throw runtime_error("No temperature data available.");
     }
