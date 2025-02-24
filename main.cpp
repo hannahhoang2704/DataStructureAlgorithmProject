@@ -23,7 +23,7 @@ int main() {
         mutex sensor_data_mutex;
     
         // Initialize GUIManager
-        GUIManager gui_manager(database, sensor_manager, queue_manager, sensors_data, sensor_data_mutex);
+        GUIManager gui_manager(database, sensor_manager, queue_manager, sensors_data, sensor_data_mutex, tempStats);
         gui_manager.initialize_gui();
 
         // Main loop

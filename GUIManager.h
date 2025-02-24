@@ -42,8 +42,8 @@ private:
     void displayStatistics();
 
 public:
-    GUIManager(DatabaseStorage& database, SensorManager& sensorManager, QueueManager& queueManager, map<string,
-               float>& data_map, mutex& data_mutex, TemperatureStatistics& tempStats);
+    GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, map<string, float>& data_map,
+               mutex& data_mutex, TemperatureStatistics& tempStats);
     ~GUIManager();
 
     void initialize_gui();            // Initialize the GUI
