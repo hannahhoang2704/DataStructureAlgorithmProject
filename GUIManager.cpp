@@ -87,6 +87,8 @@ void GUIManager::render() {
     // Render plots after stopping measurements
     if (showGraph) {
         renderPlots();
+        //Min, max, ave values
+        displayStatistics();
     }
 
     // Render GUI
@@ -132,6 +134,15 @@ void GUIManager::renderPlots() {
 
         ImGui::Text("Sensor 1");
         ImGui::PlotLines("Temp 1", values1.data(), static_cast<int>(values1.size()), 0, nullptr, min1, max1, ImVec2(0, 200));
+
+        ImGui::Spacing();
+        auto [sensor1Min, min1Timestamp] = tempStats.getMinTemperatureWithTimestamp("sensor1");
+        auto [sensor1Max, max1Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor1");
+        float sensor1Ave = tempStats.getAverageTemperature("sensor1");
+        ImGui::Text("  Sensor1 Min: %.2f °C (At %llu) | Sensor1 Max: %.2f °C (At %llu) | Sensor1 Avg: %.2f °C",
+                    sensor1Min, min1Timestamp, sensor1Max, max1Timestamp, sensor1Ave);
+        ImGui::Spacing();
+        ImGui::Spacing();
     }
 
     // Plot Sensor 2
@@ -144,12 +155,14 @@ void GUIManager::renderPlots() {
         ImGui::Text("Sensor 2");
         ImGui::PlotLines("Temp 2", values2.data(), static_cast<int>(values2.size()), 0, nullptr, min2, max2, ImVec2(0, 200));
 
-        ImGui::Separator();
-        auto [sensor2Min, minTimestamp] = tempStats.getMinTemperatureWithTimestamp("sensor2");
-        auto [sensor2Max, maxTimestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor2");
+        ImGui::Spacing();
+        auto [sensor2Min, min2Timestamp] = tempStats.getMinTemperatureWithTimestamp("sensor2");
+        auto [sensor2Max, max2Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor2");
         float sensor2Ave = tempStats.getAverageTemperature("sensor2");
-        ImGui::Text("  Min: %.2f °C (At %llu) | Max: %.2f °C (At %llu) | Avg: %.2f °C",
-                    sensor2Min, minTimestamp, sensor2Max, maxTimestamp, sensor2Ave);
+        ImGui::Text("  Sensor2 Min: %.2f °C (At %llu) | Sensor2 Max: %.2f °C (At %llu) | Sensor2 Avg: %.2f °C",
+                    sensor2Min, min2Timestamp, sensor2Max, max2Timestamp, sensor2Ave);
+        ImGui::Spacing();
+        ImGui::Spacing();
     }
 
     // Plot Sensor 3
@@ -162,13 +175,15 @@ void GUIManager::renderPlots() {
         ImGui::Text("Sensor 3");
         ImGui::PlotLines("Temp 3", values3.data(), static_cast<int>(values3.size()), 0, nullptr, min3, max3, ImVec2(0, 200));
 
-        ImGui::Separator();
-        auto [sensor3Min, minTimestamp] = tempStats.getMinTemperatureWithTimestamp("sensor3");
-        auto [sensor3Max, maxTimestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor3");
+        ImGui::Spacing();
+        auto [sensor3Min, min3Timestamp] = tempStats.getMinTemperatureWithTimestamp("sensor3");
+        auto [sensor3Max, max3Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor3");
         float sensor3Ave = tempStats.getAverageTemperature("sensor3");
 
-        ImGui::Text("  Min: %.2f °C (At %llu) | Max: %.2f °C (At %llu) | Avg: %.2f °C",
-                    sensor3Min, minTimestamp, sensor3Max, maxTimestamp, sensor3Ave);
+        ImGui::Text("  Sensor3 Min: %.2f °C (At %llu) | Sensor3 Max: %.2f °C (At %llu) | Sensor3 Avg: %.2f °C",
+                    sensor3Min, min3Timestamp, sensor3Max, max3Timestamp, sensor3Ave);
+        ImGui::Spacing();
+        ImGui::Spacing();
     }
 }
 
@@ -187,8 +202,6 @@ void GUIManager::handleStopMeasurement() {
     // Stop measurements
     sensorManager.stopAll();
     database.stop_write_thread();
-    //Min, max, ave values
-    displayStatistics();
 
     // Update plot data and state
     updatePlotData();
