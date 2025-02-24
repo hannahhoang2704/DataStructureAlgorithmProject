@@ -4,6 +4,7 @@
 #include "SensorManager.h"
 #include "GUIManager.h"
 #include "TemperatureSensor.h"
+#include "TemperatureStatistics.h"
 
 int main() {
     try {
@@ -12,6 +13,7 @@ int main() {
         QueueManager queue_manager;
         DatabaseStorage database(json_file_path, queue_manager);
         SensorManager sensor_manager;
+        TemperatureStatistics tempStats(&database);
 
         // Add sensors
         sensor_manager.addSensor(new TemperatureSensor("sensor1", "28-00000087fb7c", queue_manager, 2));

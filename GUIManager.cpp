@@ -8,7 +8,9 @@
 #include "imgui_impl_opengl3.h"
 #include <iostream>
 
-GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, map<string, float>& data_map, mutex& data_mutex)
+
+GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, map<string, float>& data_map,
+                       mutex& data_mutex, TemperatureStatistics& tempStats)
         : database(db), sensorManager(sm), queueManager(qm), temp_map(data_map), nodeDataMutex(data_mutex),
             uiObserver(temp_map, nodeDataMutex),
           isMeasuring(false), showGraph(false), window(nullptr), glsl_version(nullptr) {
@@ -85,6 +87,8 @@ void GUIManager::render() {
     if (showGraph) {
         renderPlots();
     }
+    //Min, max, ave values
+    displayStatistics();
 
     // Render GUI
     ImGui::Render();
@@ -97,7 +101,6 @@ void GUIManager::render() {
 }
 
 void GUIManager::renderControls() {
-    //ImGui::Begin("Measurement Controls");
 
     if (!isMeasuring) {
         if (ImGui::Button("Start Measurement")) {
@@ -108,8 +111,6 @@ void GUIManager::renderControls() {
             handleStopMeasurement();
         }
     }
-
-    //ImGui::End();
 }
 
 void GUIManager::renderRealTimeValues() {
@@ -122,7 +123,6 @@ void GUIManager::renderRealTimeValues() {
 
 
 void GUIManager::renderPlots() {
-    //ImGui::Begin("Sensor Data");
 
     // Plot Sensor 1
     if (!values1.empty()) {
@@ -133,6 +133,13 @@ void GUIManager::renderPlots() {
 
         ImGui::Text("Sensor 1");
         ImGui::PlotLines("Temp 1", values1.data(), static_cast<int>(values1.size()), 0, nullptr, min1, max1, ImVec2(0, 200));
+
+        ImGui::Separator();
+        auto [sensor1Min, minTimestamp] = tempStats.getMinTemperatureWithTimestamp("sensor1");
+        auto [sensor1Max, maxTimestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor1");
+        float sensor1Ave = tempStats.getAverageTemperature("sensor1");
+        ImGui::Text("  Min: %.2f °C (At %llu) | Max: %.2f °C (At %llu) | Avg: %.2f °C",
+                    sensor1Min, minTimestamp, sensor1Max, maxTimestamp, sensor1Ave);
     }
 
     // Plot Sensor 2
@@ -144,6 +151,13 @@ void GUIManager::renderPlots() {
 
         ImGui::Text("Sensor 2");
         ImGui::PlotLines("Temp 2", values2.data(), static_cast<int>(values2.size()), 0, nullptr, min2, max2, ImVec2(0, 200));
+
+        ImGui::Separator();
+        auto [sensor2Min, minTimestamp] = tempStats.getMinTemperatureWithTimestamp("sensor2");
+        auto [sensor2Max, maxTimestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor2");
+        float sensor2Ave = tempStats.getAverageTemperature("sensor2");
+        ImGui::Text("  Min: %.2f °C (At %llu) | Max: %.2f °C (At %llu) | Avg: %.2f °C",
+                    sensor2Min, minTimestamp, sensor2Max, maxTimestamp, sensor2Ave);
     }
 
     // Plot Sensor 3
@@ -155,9 +169,15 @@ void GUIManager::renderPlots() {
 
         ImGui::Text("Sensor 3");
         ImGui::PlotLines("Temp 3", values3.data(), static_cast<int>(values3.size()), 0, nullptr, min3, max3, ImVec2(0, 200));
-    }
 
-    //ImGui::End();
+        ImGui::Separator();
+        auto [sensor3Min, minTimestamp] = tempStats.getMinTemperatureWithTimestamp("sensor3");
+        auto [sensor3Max, maxTimestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor3");
+        float sensor3Ave = tempStats.getAverageTemperature("sensor3");
+
+        ImGui::Text("  Min: %.2f °C (At %llu) | Max: %.2f °C (At %llu) | Avg: %.2f °C",
+                    sensor3Min, minTimestamp, sensor3Max, maxTimestamp, sensor3Ave);
+    }
 }
 
 
@@ -189,6 +209,26 @@ void GUIManager::updatePlotData() {
     database.preparePlotData("sensor1", timestamps, values, time1, values1);
     database.preparePlotData("sensor2", timestamps, values, time2, values2);
     database.preparePlotData("sensor3", timestamps, values, time3, values3);
+}
+
+void GUIManager::displayStatistics() {
+    ImGui::Separator();
+    try {
+        // Fetch overall statistics via TemperatureStatistics
+        float globalMin = tempStats.getMinTemperature();
+        float globalMax = tempStats.getMaxTemperature();
+        float globalAvg = tempStats.getAverageTemperatureAllSensors();
+
+        // Display the summary
+        ImGui::Text("Summary of All Sensors:");
+        ImGui::Text("  Minimum Temperature: %.2f °C", globalMin);
+        ImGui::Text("  Maximum Temperature: %.2f °C", globalMax);
+        ImGui::Text("  Average Temperature: %.2f °C", globalAvg);
+
+    } catch (const std::exception& e) {
+        // Handle potential errors, e.g., no data available
+        ImGui::Text("Error displaying statistics: %s", e.what());
+    }
 }
 
 void GUIManager::cleanup_gui() {
