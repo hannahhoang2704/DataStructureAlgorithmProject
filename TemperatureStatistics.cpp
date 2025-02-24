@@ -65,7 +65,7 @@ pair<float, string> TemperatureStatistics::getMaxTemperatureWithTimestamp(const 
     auto maxIter = max_element(temps.begin(), temps.end());
     size_t maxIndex = distance(temps.begin(), maxIter);
 
-    uint64_t rawTimestamp = timestamps[minIndex];
+    uint64_t rawTimestamp = timestamps[maxIndex];
     // Format the timestamp into a human-readable string
     std::time_t time = static_cast<std::time_t>(rawTimestamp);
     std::tm* localTime = std::localtime(&time);
