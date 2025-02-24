@@ -39,3 +39,9 @@ bool SensorManager::allInitialized() {
     }
     return true;
 }
+
+SensorManager::~SensorManager() {
+    for(auto sensor: sensors){
+        delete sensor;
+    }
+}

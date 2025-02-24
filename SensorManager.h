@@ -19,6 +19,7 @@ class SensorManager {
     condition_variable convar_initialized;
 
 public:
+    ~SensorManager();
     void addSensor(TemperatureSensor* sensor);
     void startAll();
     void stopAll();
