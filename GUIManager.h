@@ -21,16 +21,17 @@ private:
     DatabaseStorage& database;        // Reference to the database
     SensorManager& sensorManager;     // Reference to the sensor manager
     QueueManager& queueManager;       // Reference to the queue manager
-
+    mutex& nodeDataMutex;              // Mutex to ensure thread-safe access
     UIObserver uiObserver;            // Observer to track real-time sensor updates
 
     bool isMeasuring;                 // Indicator if measurement is running
     bool showGraph;                   // Indicator to show graph after stopping
 
     // Real-time temperature values (Observed by `uiObserver`)
-    float& temp1;
-    float& temp2;
-    float& temp3;
+    // float& temp1;
+    // float& temp2;
+    // float& temp3;
+    map<string, float>temp_map;
 
     // Graph data
     std::vector<float> time1, values1, time2, values2, time3, values3;
@@ -42,7 +43,8 @@ private:
     void updatePlotData();            // Update plot data upon stopping measurements
 
 public:
-    GUIManager(DatabaseStorage& database, SensorManager& sensorManager, QueueManager& queueManager, float& t1, float& t2, float& t3);
+    GUIManager(DatabaseStorage& database, SensorManager& sensorManager, QueueManager& queueManager, map<string, float>& data_map, mutex& data_mutex
+    );
     ~GUIManager();
 
     void initialize_gui();            // Initialize the GUI

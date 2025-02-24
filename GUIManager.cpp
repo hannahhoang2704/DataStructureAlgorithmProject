@@ -8,10 +8,11 @@
 #include "imgui_impl_opengl3.h"
 #include <iostream>
 
-GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, float& t1, float& t2, float& t3)
-        : database(db), sensorManager(sm), queueManager(qm),
-          uiObserver(t1, t2, t3), // Initialize UIObserver
-          temp1(t1), temp2(t2), temp3(t3),
+GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, map<string, float>& data_map, mutex& data_mutex)
+        : database(db), sensorManager(sm), queueManager(qm), temp_map(data_map), nodeDataMutex(data_mutex),
+            uiObserver(temp_map, nodeDataMutex),
+          //uiObserver(t1, t2, t3), // Initialize UIObserver
+          //temp1(t1), temp2(t2), temp3(t3),
           isMeasuring(false), showGraph(false), window(nullptr), glsl_version(nullptr) {
     // Add the observer to the queue
     queueManager.add_observer(&uiObserver);
@@ -114,12 +115,13 @@ void GUIManager::renderControls() {
 }
 
 void GUIManager::renderRealTimeValues() {
-    //ImGui::Begin("Real-Time Sensor Values");
-    ImGui::Text("Sensor 1: %.2f °C", temp1);
-    ImGui::Text("Sensor 2: %.2f °C", temp2);
-    ImGui::Text("Sensor 3: %.2f °C", temp3);
-    //ImGui::End();
+    lock_guard<mutex> lock(nodeDataMutex); // Lock for thread safety
+
+    for (const auto& entry : temp_map) {
+        ImGui::Text("%s: %.2f °C", entry.first.c_str(), entry.second);
+    }
 }
+
 
 void GUIManager::renderPlots() {
     //ImGui::Begin("Sensor Data");
