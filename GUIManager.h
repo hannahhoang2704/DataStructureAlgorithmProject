@@ -40,7 +40,7 @@ private:
     void renderRealTimeValues();
     void updatePlotData();
     void displayStatistics();
-    std::string formatTimestamp(uint64_t rawTimestamp);
+    static std::string formatTimestamp(uint64_t rawTimestamp);
 
 public:
     GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, map<string, float>& data_map,

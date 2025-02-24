@@ -134,7 +134,7 @@ float TemperatureStatistics::getAverageTemperatureAllSensors() {
     return totalSum / totalCount;
 }
 
-static std::string formatTimestamp(uint64_t rawTimestamp) {
+static std::string TemperatureStatistics::formatTimestamp(uint64_t rawTimestamp) {
     std::time_t time = static_cast<std::time_t>(rawTimestamp);
 
     std::ostringstream formattedTime;
