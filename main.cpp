@@ -1,55 +1,38 @@
-#include <iostream>
-#include <fstream>
-#include <map>
-#include <nlohmann/json.hpp>
-#include "TemperatureSensor.h"
+
 #include "QueueManager.h"
 #include "DatabaseStorage.h"
-#include "InfoNode.h"
+#include "SensorManager.h"
+#include "GUIManager.h"
+#include "TemperatureSensor.h"
 
-using namespace std;
-using json = nlohmann::json;
-int main(){
-    // string json_file_path = "/Users/HannahHoang/DataStructureAlgorithmProject/database/database.json"; //MUST CHANGE THIS TO LOCAL ABS PATH
-    string json_file_path = "/home/hannah/DataStructureAlgorithmProject/database/database.json"; //MUST CHANGE THIS TO LOCAL ABS PATH
+int main() {
+    try {
+        // Paths and initialization
+        std::string json_file_path = "/home/andrea/Documents/projects/DataStructureAlgorithmProject/database/database.json"; // path on raspberry
+        QueueManager queue_manager;
+        DatabaseStorage database(json_file_path, queue_manager);
+        SensorManager sensor_manager;
 
-    // Map sensor IDs to their corresponding directory names
-    map<int, string> sensorMap {
-            {1, "28-00000087fb7c"},
-            {2, "28-00000085e6ff"},
-            {3, "28-000000849be2"}
-    };
+        // Add sensors
+        sensor_manager.addSensor(new TemperatureSensor("sensor1", "28-00000087fb7c", queue_manager, 2));
+        sensor_manager.addSensor(new TemperatureSensor("sensor2", "28-00000085e6ff", queue_manager, 3));
+        sensor_manager.addSensor(new TemperatureSensor("sensor3", "28-000000849be2", queue_manager,2));
+        map<string, float> sensors_data;
+        mutex sensor_data_mutex;
+    
+        // Initialize GUIManager
+        GUIManager gui_manager(database, sensor_manager, queue_manager, sensors_data, sensor_data_mutex);
+        gui_manager.initialize_gui();
 
-    QueueManager queue_manager;
-    DatabaseStorage database(json_file_path, queue_manager);
-    database.start_write_thread();
-
-    TemperatureSensor temp_sensor1("sensor1", sensorMap[1],  queue_manager, 3);
-    TemperatureSensor temp_sensor2("sensor2", sensorMap[2], queue_manager);
-    TemperatureSensor temp_sensor3("sensor3", sensorMap[3], queue_manager, 4);
-
-    temp_sensor1.start_temp_reading_thread();
-    temp_sensor2.start_temp_reading_thread();
-    temp_sensor3.start_temp_reading_thread();
-    this_thread::sleep_for(chrono::seconds(15));
-
-    temp_sensor1.stop_temp_reading_thread();
-    temp_sensor2.stop_temp_reading_thread();
-    temp_sensor3.stop_temp_reading_thread();
-    database.stop_write_thread();
-    json j_data;
-    j_data = database.read_database();
-    cout << "json database  " << j_data.dump(4) << endl;
-
-    //Do search and filter data from database json file
-    map<string, map<uint64_t, int>> sensor_data = j_data.get<map<string, map<uint64_t, int>>>();
-    for (const auto& [sensor, readings] : sensor_data) {
-        cout << "Sensor: " << sensor << endl;
-        for (const auto& [timestamp, temp] : readings) {
-            if (temp > 3) {
-                cout << "  Timestamp: " << timestamp << " -> Temp: " << temp << endl;
-            }
+        // Main loop
+        while (!glfwWindowShouldClose(gui_manager.getWindow())) {
+            glfwPollEvents();
+            gui_manager.render();
         }
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return EXIT_FAILURE;
     }
+
     return EXIT_SUCCESS;
 }

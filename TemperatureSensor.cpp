@@ -3,12 +3,14 @@
 //
 
 #include "TemperatureSensor.h"
-#include "InfoNode.h"
+#include "SensorManager.h"
+
+#define SENSORS_PATH "/sys/bus/w1/devices/"
 
 void TemperatureSensor::openFile() {
-    sensor_file.open(SENSORS_PATH + sensorDir + "/w1_slave");
+    sensor_file.open(SENSORS_PATH + file_name + "/w1_slave");
     if (!sensor_file.is_open()) {
-        cerr << "Error: Could not open " << SENSORS_PATH + sensorDir << endl;
+        cerr << "Error: Could not open " << SENSORS_PATH + file_name << endl;
     }
 }
 
@@ -18,6 +20,11 @@ TemperatureSensor::~TemperatureSensor() {
 
 void TemperatureSensor::start_temp_reading_thread() {
     cout << "Reading temperature from "<< name << " every " << interval << " seconds"<< endl;
+    if (temperature_reader.joinable()) {
+        terminated = true;
+        temperature_reader.join();
+    }
+
     terminated = false;
     temperature_reader= thread(&TemperatureSensor::read_temperature, this);
 }
@@ -35,18 +42,31 @@ void TemperatureSensor::read_temperature() {
     while(!terminated){
         uint64_t timestamp = chrono::duration_cast<chrono::seconds>(chrono::system_clock::now().time_since_epoch()).count();
         auto t_c = static_cast<time_t>(timestamp);
-        float temp = get_temperature();
-        InfoNode node(name, timestamp, temp);
-        cout << "[" << put_time(localtime(&t_c), "%Y-%m-%d %H:%M:%S") << "]\t" << name << ": " << temp <<  " °C"<< endl;
-        queue_manager.push_back(node);
+
+        lock_guard<mutex> temp_lock(temp_mutex);
+        temp = get_temperature();
+
+        if (temp == -1) {
+            cerr << "Error: Failed to read temperature from: " << name << endl;
+        } else {
+            if (!is_initialized) {
+                is_initialized = true;
+            }
+            InfoNode node(name, timestamp, temp);
+            cout << "[" << put_time(localtime(&t_c), "%Y-%m-%d %H:%M:%S") << "]\t" << name << ": " << temp << " °C" << endl;
+            queue_manager.push_back(node);
+        }
         this_thread::sleep_for(chrono::seconds(interval));
     }
 }
 
 float TemperatureSensor::get_temperature() {
+    lock_guard<mutex> lock(file_mutex);
     if (!sensor_file.is_open()) {
+        cerr << "Reopening sensor file for " << name << endl;
         openFile();
         if (!sensor_file.is_open()) {
+            cerr << "ERROR: Could not reopen sensor file for " << name << endl;
             return -1;
         }
     }
@@ -67,3 +87,9 @@ float TemperatureSensor::get_temperature() {
 
     return -1;
 }
+
+float TemperatureSensor::temperature_getter() {
+    lock_guard<mutex> temp_lock(temp_mutex);
+    return temp;
+}
+
