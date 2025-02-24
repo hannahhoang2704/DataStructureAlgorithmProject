@@ -29,7 +29,7 @@ void TemperatureStatistics::loadDataFromDatabase() {
     }
 }
 
-pair<float, string> TemperatureStatistics::getMinTemperatureWithTimestamp(const string& sensorName)  {
+pair<float, string> TemperatureStatistics::getMinTemperatureWithTimestamp(const string& sensorName) {
     loadDataFromDatabase();
 
     auto sensorIt = sensorTemperatures.find(sensorName);
@@ -43,16 +43,10 @@ pair<float, string> TemperatureStatistics::getMinTemperatureWithTimestamp(const 
     size_t minIndex = distance(temps.begin(), minIter);
 
     uint64_t rawTimestamp = timestamps[minIndex];
-    // Format the timestamp into a human-readable string
-    std::time_t time = static_cast<std::time_t>(rawTimestamp);
-    std::tm* localTime = std::localtime(&time);
-    char buffer[100];
-    if (std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime)) {
-        return {*minIter, std::string(buffer)};
-    } else {
-        return {*minIter, "Invalid Time"};
-    }
+
+    return {*minIter, formatTimestamp(rawTimestamp)};
 }
+
 
 pair<float, string> TemperatureStatistics::getMaxTemperatureWithTimestamp(const string& sensorName) {
     loadDataFromDatabase();
@@ -68,16 +62,10 @@ pair<float, string> TemperatureStatistics::getMaxTemperatureWithTimestamp(const 
     size_t maxIndex = distance(temps.begin(), maxIter);
 
     uint64_t rawTimestamp = timestamps[maxIndex];
-    // Format the timestamp into a human-readable string
-    std::time_t time = static_cast<std::time_t>(rawTimestamp);
-    std::tm* localTime = std::localtime(&time);
-    char buffer[100];
-    if (std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime)) {
-        return {*maxIter, std::string(buffer)};
-    } else {
-        return {*maxIter, "Invalid Time"};
-    }
+
+    return {*maxIter, formatTimestamp(rawTimestamp)};
 }
+
 
 float TemperatureStatistics::getMinTemperature() {
     loadDataFromDatabase();
@@ -145,6 +133,19 @@ float TemperatureStatistics::getAverageTemperatureAllSensors() {
 
     return totalSum / totalCount;
 }
+
+static std::string formatTimestamp(uint64_t rawTimestamp) {
+    std::time_t time = static_cast<std::time_t>(rawTimestamp);
+
+    std::ostringstream formattedTime;
+    std::tm* localTime = std::localtime(&time);
+    if (localTime) {
+        formattedTime << std::put_time(localTime, "%Y-%m-%d %H:%M:%S");
+        return formattedTime.str();
+    }
+    return "Invalid Time";
+}
+
 
 void TemperatureStatistics::clearData() {
     sensorTemperatures.clear();
