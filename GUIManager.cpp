@@ -88,8 +88,6 @@ void GUIManager::render() {
     if (showGraph) {
         renderPlots();
     }
-    //Min, max, ave values
-    displayStatistics();
 
     // Render GUI
     ImGui::Render();
@@ -134,13 +132,6 @@ void GUIManager::renderPlots() {
 
         ImGui::Text("Sensor 1");
         ImGui::PlotLines("Temp 1", values1.data(), static_cast<int>(values1.size()), 0, nullptr, min1, max1, ImVec2(0, 200));
-
-        ImGui::Separator();
-        auto [sensor1Min, minTimestamp] = tempStats.getMinTemperatureWithTimestamp("sensor1");
-        auto [sensor1Max, maxTimestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor1");
-        float sensor1Ave = tempStats.getAverageTemperature("sensor1");
-        ImGui::Text("  Min: %.2f °C (At %llu) | Max: %.2f °C (At %llu) | Avg: %.2f °C",
-                    sensor1Min, minTimestamp, sensor1Max, maxTimestamp, sensor1Ave);
     }
 
     // Plot Sensor 2
@@ -196,6 +187,8 @@ void GUIManager::handleStopMeasurement() {
     // Stop measurements
     sensorManager.stopAll();
     database.stop_write_thread();
+    //Min, max, ave values
+    displayStatistics();
 
     // Update plot data and state
     updatePlotData();
@@ -214,22 +207,15 @@ void GUIManager::updatePlotData() {
 
 void GUIManager::displayStatistics() {
     ImGui::Separator();
-    try {
-        // Fetch overall statistics via TemperatureStatistics
-        float globalMin = tempStats.getMinTemperature();
-        float globalMax = tempStats.getMaxTemperature();
-        float globalAvg = tempStats.getAverageTemperatureAllSensors();
+    float globalMin = tempStats.getMinTemperature();
+    float globalMax = tempStats.getMaxTemperature();
+    float globalAvg = tempStats.getAverageTemperatureAllSensors();
 
-        // Display the summary
-        ImGui::Text("Summary of All Sensors:");
-        ImGui::Text("  Minimum Temperature: %.2f °C", globalMin);
-        ImGui::Text("  Maximum Temperature: %.2f °C", globalMax);
-        ImGui::Text("  Average Temperature: %.2f °C", globalAvg);
-
-    } catch (const std::exception& e) {
-        // Handle potential errors, e.g., no data available
-        ImGui::Text("Error displaying statistics: %s", e.what());
-    }
+    // Display the summary
+    ImGui::Text("Summary of All Sensors:");
+    ImGui::Text("  Minimum Temperature: %.2f °C", globalMin);
+    ImGui::Text("  Maximum Temperature: %.2f °C", globalMax);
+    ImGui::Text("  Average Temperature: %.2f °C", globalAvg);
 }
 
 void GUIManager::cleanup_gui() {

@@ -5,11 +5,7 @@
 #include "TemperatureStatistics.h"
 #include <stdexcept>
 
-TemperatureStatistics::TemperatureStatistics(DatabaseStorage* dbStorage) : databaseStorage(dbStorage) {
-    if (!databaseStorage) {
-        throw runtime_error("DatabaseStorage cannot be null");
-    }
-}
+TemperatureStatistics::TemperatureStatistics(DatabaseStorage* dbStorage) : databaseStorage(dbStorage) {}
 
 void TemperatureStatistics::addSensorData(const string& sensorName, const vector<float>& temps, const vector<uint64_t>& timestamps) {
     if (temps.size() != timestamps.size()) {
@@ -34,11 +30,14 @@ void TemperatureStatistics::loadDataFromDatabase() {
 }
 
 pair<float, string> TemperatureStatistics::getMinTemperatureWithTimestamp(const string& sensorName) const {
-    if (sensorTemperatures.find(sensorName) == sensorTemperatures.end()) {
-        throw runtime_error("Sensor '" + sensorName + "' not found!");
+    loadDataFromDatabase();
+
+    auto sensorIt = sensorTemperatures.find(sensorName);
+    if (sensorIt == sensorTemperatures.end() || sensorIt->second.empty()) {
+        throw runtime_error("Sensor '" + sensorName + "' not found or has no data!");
     }
 
-    const auto& temps = sensorTemperatures.at(sensorName);
+    const auto& temps = sensorIt->second;
     const auto& timestamps = sensorTimestamps.at(sensorName);
     auto minIter = min_element(temps.begin(), temps.end());
     size_t minIndex = distance(temps.begin(), minIter);
@@ -56,11 +55,14 @@ pair<float, string> TemperatureStatistics::getMinTemperatureWithTimestamp(const 
 }
 
 pair<float, string> TemperatureStatistics::getMaxTemperatureWithTimestamp(const string& sensorName) const {
-    if (sensorTemperatures.find(sensorName) == sensorTemperatures.end()) {
-        throw runtime_error("Sensor '" + sensorName + "' not found!");
+    loadDataFromDatabase();
+
+    auto sensorIt = sensorTemperatures.find(sensorName);
+    if (sensorIt == sensorTemperatures.end() || sensorIt->second.empty()) {
+        throw runtime_error("Sensor '" + sensorName + "' not found or has no data!");
     }
 
-    const auto& temps = sensorTemperatures.at(sensorName);
+    const auto& temps = sensorIt->second;
     const auto& timestamps = sensorTimestamps.at(sensorName);
     auto maxIter = max_element(temps.begin(), temps.end());
     size_t maxIndex = distance(temps.begin(), maxIter);
@@ -78,11 +80,14 @@ pair<float, string> TemperatureStatistics::getMaxTemperatureWithTimestamp(const 
 }
 
 float TemperatureStatistics::getMinTemperature() const {
+    loadDataFromDatabase();
+
     if (sensorTemperatures.empty()) {
         throw runtime_error("No temperature data available.");
     }
 
     float globalMin = numeric_limits<float>::max();
+    // Iterate through the latest data from `sensorTemperatures`
     for (const auto& [sensorName, temps] : sensorTemperatures) {
         float minTemp = *min_element(temps.begin(), temps.end());
         globalMin = min(globalMin, minTemp);
@@ -91,11 +96,14 @@ float TemperatureStatistics::getMinTemperature() const {
 }
 
 float TemperatureStatistics::getMaxTemperature() const {
+    loadDataFromDatabase();
+
     if (sensorTemperatures.empty()) {
         throw runtime_error("No temperature data available.");
     }
 
     float globalMax = numeric_limits<float>::lowest();
+    // Iterate through the latest data from `sensorTemperatures`
     for (const auto& [sensorName, temps] : sensorTemperatures) {
         float maxTemp = *max_element(temps.begin(), temps.end());
         globalMax = max(globalMax, maxTemp);
@@ -104,17 +112,15 @@ float TemperatureStatistics::getMaxTemperature() const {
 }
 
 float TemperatureStatistics::getAverageTemperature(const string& sensorName) const {
-    if (sensorTemperatures.find(sensorName) == sensorTemperatures.end()) {
+    loadDataFromDatabase();
+
+    auto sensorIt = sensorTemperatures.find(sensorName);
+    if (sensorIt == sensorTemperatures.end() || sensorIt->second.empty()) {
         throw runtime_error("Sensor '" + sensorName + "' not found!");
     }
 
-    const auto& temps = sensorTemperatures.at(sensorName);
-
-    if (temps.empty()) {
-        throw runtime_error("No temperature data available for sensor: " + sensorName);
-    }
-
-    float sum = std::accumulate(temps.begin(), temps.end(), 0.0);
+    const auto& temps = sensorIt->second;
+    float sum = accumulate(temps.begin(), temps.end(), 0.0f);
     return sum / temps.size();
 }
 
