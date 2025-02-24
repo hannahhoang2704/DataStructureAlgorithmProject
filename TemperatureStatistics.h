@@ -19,6 +19,7 @@ private:
     map<string, vector<float>> sensorTemperatures;
     map<string, vector<uint64_t>> sensorTimestamps;
     DatabaseStorage* databaseStorage;
+    static std::string formatTimestamp(uint64_t rawTimestamp);
 
 public:
     TemperatureStatistics(DatabaseStorage* dbStorage);
