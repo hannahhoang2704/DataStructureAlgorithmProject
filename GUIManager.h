@@ -27,10 +27,7 @@ private:
     bool isMeasuring;                 // Indicator if measurement is running
     bool showGraph;                   // Indicator to show graph after stopping
 
-    // Real-time temperature values (Observed by `uiObserver`)
-    // float& temp1;
-    // float& temp2;
-    // float& temp3;
+    // Real-time temperature values updated from a map of temperature name as key and temperature value (Observed by `uiObserver`)
     map<string, float>temp_map;
 
     // Graph data

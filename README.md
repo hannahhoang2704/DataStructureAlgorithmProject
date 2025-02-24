@@ -15,7 +15,8 @@ A JSON library for C++.
 sudo apt install nlohmann-json3-dev
 ```
 
-## imgui dependencies
+## imgui dependencies 
+Prerequisites: to run imgui on raspbian, install the packages below:
 ```sh
 sudo apt-get update
 sudo apt install libglfw3-dev libgles2-mesa-dev

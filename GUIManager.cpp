@@ -11,8 +11,6 @@
 GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, map<string, float>& data_map, mutex& data_mutex)
         : database(db), sensorManager(sm), queueManager(qm), temp_map(data_map), nodeDataMutex(data_mutex),
             uiObserver(temp_map, nodeDataMutex),
-          //uiObserver(t1, t2, t3), // Initialize UIObserver
-          //temp1(t1), temp2(t2), temp3(t3),
           isMeasuring(false), showGraph(false), window(nullptr), glsl_version(nullptr) {
     // Add the observer to the queue
     queueManager.add_observer(&uiObserver);

@@ -22,7 +22,6 @@ public:
     void update(InfoNode& node) override{
         lock_guard<mutex> lock(data_mutex);
         sensor_map[node.name] = node.temp;
-
     }
 private:
     map<string, float>&sensor_map;
