@@ -79,7 +79,7 @@ pair<float, string> TemperatureStatistics::getMaxTemperatureWithTimestamp(const 
     }
 }
 
-float TemperatureStatistics::getMinTemperature() const {
+float TemperatureStatistics::getMinTemperature() {
     loadDataFromDatabase();
 
     if (sensorTemperatures.empty()) {

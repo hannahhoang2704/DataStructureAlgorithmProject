@@ -26,13 +26,12 @@ public:
     void loadDataFromDatabase();
     void clearData();
 
-    // Removed "const" to allow modification of the object state
     pair<float, string> getMinTemperatureWithTimestamp(const string& sensorName);
     pair<float, string> getMaxTemperatureWithTimestamp(const string& sensorName);
     float getMinTemperature();
     float getMaxTemperature();
     float getAverageTemperature(const string& sensorName);
-    float getAverageTemperatureAllSensors() const;
+    float getAverageTemperatureAllSensors();
 };
 
 #endif // TEMPERATURESTATISTICS_H
