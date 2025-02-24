@@ -24,8 +24,9 @@ public:
     TemperatureStatistics(DatabaseStorage* dbStorage);
     void addSensorData(const string& sensorName, const vector<float>& temps, const vector<uint64_t>& timestamps);
     void loadDataFromDatabase();
-    pair<float, uint64_t> getMinTemperatureWithTimestamp(const string& sensorName) const;
-    pair<float, uint64_t> getMaxTemperatureWithTimestamp(const string& sensorName) const;
+    void clearData();
+    pair<float, string> getMinTemperatureWithTimestamp(const string& sensorName) const;
+    pair<float, string> getMaxTemperatureWithTimestamp(const string& sensorName) const;
     float getMinTemperature() const;
     float getMaxTemperature() const;
     float getAverageTemperature(const string& sensorName) const;

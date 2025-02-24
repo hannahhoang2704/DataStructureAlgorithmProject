@@ -137,3 +137,8 @@ float TemperatureStatistics::getAverageTemperatureAllSensors() const {
 
     return totalSum / totalCount;
 }
+
+void TemperatureStatistics::clearData() {
+    sensorTemperatures.clear();
+    sensorTimestamps.clear();
+}
