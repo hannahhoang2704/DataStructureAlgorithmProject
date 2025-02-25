@@ -7,12 +7,15 @@
 
 #include <vector>
 #include <string>
+#include <vector>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include "DatabaseStorage.h"
 #include "SensorManager.h"
 #include "QueueManager.h"
 #include "Observer.h"
+#include "Statistic.h"
+#include "InfoNode.h"
 
 class GUIManager {
 private:
@@ -23,13 +26,14 @@ private:
     QueueManager& queueManager;       // Reference to the queue manager
     mutex& nodeDataMutex;              // Mutex to ensure thread-safe access
     UIObserver uiObserver;            // Observer to track real-time sensor updates
+    Statistic& statistics;
 
     bool isMeasuring;                 // Indicator if measurement is running
     bool showGraph;                   // Indicator to show graph after stopping
 
     // Real-time temperature values updated from a map of temperature name as key and temperature value (Observed by `uiObserver`)
     map<string, float>temp_map;
-
+    vector<SensorInfo> &sensor_info;
     // Graph data
     std::vector<float> time1, values1, time2, values2, time3, values3;
 
@@ -38,9 +42,10 @@ private:
     void renderPlots();               // Render the plots when showing the graph
     void renderRealTimeValues();      // Render real-time temperature values
     void updatePlotData();            // Update plot data upon stopping measurements
+    void display_predict_temp();
 
 public:
-    GUIManager(DatabaseStorage& database, SensorManager& sensorManager, QueueManager& queueManager, map<string, float>& data_map, mutex& data_mutex
+    GUIManager(DatabaseStorage& database, SensorManager& sensorManager, QueueManager& queueManager, Statistic& statistic, map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info
     );
     ~GUIManager();
 

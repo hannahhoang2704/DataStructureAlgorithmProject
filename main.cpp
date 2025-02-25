@@ -1,9 +1,14 @@
 
+#include <vector>
 #include "QueueManager.h"
 #include "DatabaseStorage.h"
 #include "SensorManager.h"
 #include "GUIManager.h"
 #include "TemperatureSensor.h"
+#include "Statistic.h"
+#include "LinearRegression.h"
+
+using namespace std;
 
 int main() {
     try {
@@ -12,16 +17,28 @@ int main() {
         QueueManager queue_manager;
         DatabaseStorage database(json_file_path, queue_manager);
         SensorManager sensor_manager;
+        LinearRegression linear_regression;
+        Statistic statistics(linear_regression, database);
+
+        std::vector<SensorInfo> sensors_config = {
+                {"sensor1", "28-00000087fb7c", 2},
+                {"sensor2", "28-00000085e6ff", 3},
+                {"sensor3", "28-000000849be2", 2}
+        };
 
         // Add sensors
-        sensor_manager.addSensor(new TemperatureSensor("sensor1", "28-00000087fb7c", queue_manager, 2));
-        sensor_manager.addSensor(new TemperatureSensor("sensor2", "28-00000085e6ff", queue_manager, 3));
-        sensor_manager.addSensor(new TemperatureSensor("sensor3", "28-000000849be2", queue_manager,2));
+        for (const auto& sensor : sensors_config) {
+            sensor_manager.addSensor(new TemperatureSensor(sensor.name, sensor.fileName, queue_manager, sensor.interval));
+        }
+
+//        sensor_manager.addSensor(new TemperatureSensor("sensor1", "28-00000087fb7c", queue_manager, 2));
+//        sensor_manager.addSensor(new TemperatureSensor("sensor2", "28-00000085e6ff", queue_manager, 3));
+//        sensor_manager.addSensor(new TemperatureSensor("sensor3", "28-000000849be2", queue_manager,2));
         map<string, float> sensors_data;
         mutex sensor_data_mutex;
-    
+
         // Initialize GUIManager
-        GUIManager gui_manager(database, sensor_manager, queue_manager, sensors_data, sensor_data_mutex);
+        GUIManager gui_manager(database, sensor_manager, queue_manager, statistics, sensors_data, sensor_data_mutex, sensors_config);
         gui_manager.initialize_gui();
 
         // Main loop

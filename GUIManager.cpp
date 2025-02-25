@@ -8,8 +8,8 @@
 #include "imgui_impl_opengl3.h"
 #include <iostream>
 
-GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, map<string, float>& data_map, mutex& data_mutex)
-        : database(db), sensorManager(sm), queueManager(qm), temp_map(data_map), nodeDataMutex(data_mutex),
+GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, Statistic& statistic,map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info)
+        : database(db), sensorManager(sm), queueManager(qm), statistics(statistic), temp_map(data_map), nodeDataMutex(data_mutex), sensor_info(sensor_info),
             uiObserver(temp_map, nodeDataMutex),
           isMeasuring(false), showGraph(false), window(nullptr), glsl_version(nullptr) {
     // Add the observer to the queue
@@ -177,6 +177,7 @@ void GUIManager::handleStopMeasurement() {
     database.stop_write_thread();
 
     // Update plot data and state
+    display_predict_temp();
     updatePlotData();
     isMeasuring = false;
     showGraph = true;
@@ -190,6 +191,15 @@ void GUIManager::updatePlotData() {
     database.preparePlotData("sensor2", timestamps, values, time2, values2);
     database.preparePlotData("sensor3", timestamps, values, time3, values3);
 }
+
+void GUIManager::display_predict_temp() {
+    for(auto &sensor: sensor_info){
+        float predict_value=-100;
+        statistics.predict_future_temp(sensor.name, static_cast<uint64_t>(sensor.interval), predict_value);
+        ImGui::Text("Prediction: %s: %.2f °C ", sensor.name.c_str(), predict_value);
+    }
+}
+
 
 void GUIManager::cleanup_gui() {
     ImGui_ImplOpenGL3_Shutdown();
