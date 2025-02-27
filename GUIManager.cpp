@@ -84,6 +84,7 @@ void GUIManager::render() {
     // Render plots after stopping measurements
     if (showGraph) {
         renderPlots();
+        display_predict_temp();
     }
 
     // Render GUI
@@ -177,7 +178,6 @@ void GUIManager::handleStopMeasurement() {
     database.stop_write_thread();
 
     // Update plot data and state
-    display_predict_temp();
     updatePlotData();
     isMeasuring = false;
     showGraph = true;
