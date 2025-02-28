@@ -27,35 +27,36 @@ void DatabaseStorage::write_database() {
     while (running) {
         InfoNode node;
         if (queue_manager.pop_data(node)) {
-            lock_guard<mutex> lock(file_lock);
+            std::lock_guard<std::mutex> lock(file_lock);
 
-            // Add temperature-timestamp pair to the vector
-            data_container[node.name].push_back({node.timestamps, node.temp});
+            data_container[node.name][node.timestamps] = node.temp;
 
-            // Serialize to JSON
-            json_data = json::object();
-            for (const auto& [sensorName, entries] : data_container) {
-                json_data[sensorName] = json::array();
-                for (const auto& [timestamp, temp] : entries) {
-                    json_data[sensorName].push_back({timestamp, temp});
+            // construct the JSON object
+            nlohmann::json json_data = nlohmann::json::object();
+            for (const auto& [sensorName, readings] : data_container) {
+                nlohmann::json sensor_data = nlohmann::json::object();
+                for (const auto& [timestamp, temperature] : readings) {
+                    sensor_data[std::to_string(timestamp)] = temperature;
                 }
+                json_data[sensorName] = sensor_data;
             }
 
-            // Write data to the JSON file
-            ofstream write_file(file_path);
+            // Write the JSON data to the file
+            std::ofstream write_file(file_path);
             if (write_file.is_open()) {
-                cout << "Write data " << json_data << " to JSON file " << file_path << endl;
-                write_file << json_data.dump(4);
+                std::cout << "Writing data to JSON file " << file_path << std::endl;
+                write_file << json_data.dump(4); // Pretty-print with 4-space indentation
                 write_file.close();
             } else {
-                cerr << "Can't open write_file " << file_path << " to write" << endl;
+                std::cerr << "Unable to open file " << file_path << " for writing" << std::endl;
             }
         }
 
-        this_thread::sleep_for(chrono::nanoseconds(500));
+        std::this_thread::sleep_for(std::chrono::nanoseconds(500));
     }
-    cout << "Stop database writer thread " << endl;
+    std::cout << "Stopping database writer thread" << std::endl;
 }
+
 
 pair<map<string, vector<uint64_t>>, map<string, vector<float>>> DatabaseStorage::read_database() {
     lock_guard<mutex> lock(file_lock);
