@@ -4,6 +4,8 @@
 
 #include "TemperatureStatistics.h"
 #include <stdexcept>
+#include <iomanip>
+#include <sstream>
 
 TemperatureStatistics::TemperatureStatistics(DatabaseStorage* dbStorage) : databaseStorage(dbStorage) {}
 
@@ -137,14 +139,17 @@ float TemperatureStatistics::getAverageTemperatureAllSensors() {
 std::string TemperatureStatistics::formatTimestamp(uint64_t rawTimestamp) {
     std::time_t time = static_cast<std::time_t>(rawTimestamp);
 
-    std::ostringstream formattedTime;
-    std::tm* localTime = std::localtime(&time);
-    if (localTime) {
-        formattedTime << std::put_time(localTime, "%Y-%m-%d %H:%M:%S");
-        return formattedTime.str();
+    std::tm* tm = std::localtime(&time);
+
+    if (!tm) {
+        return "Invalid Time";
     }
-    return "Invalid Time";
+
+    std::ostringstream oss;
+    oss << std::put_time(tm, "%Y-%m-%d %H:%M:%S");
+    return oss.str();
 }
+
 
 
 void TemperatureStatistics::clearData() {
