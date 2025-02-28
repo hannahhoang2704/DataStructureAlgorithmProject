@@ -23,4 +23,16 @@ public:
     }
 
 };
+
+
+using namespace std;
+struct SensorInfo {
+    std::string name;
+    std::string fileName;
+    int interval;
+
+    SensorInfo(const string& n, const string& f, int i)
+            : name(n), fileName(f), interval(i) {}
+};
+
 #endif //DATASTRUCTUREALGORITHMSPROJECT_INFONODE_H

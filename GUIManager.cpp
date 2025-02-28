@@ -8,13 +8,10 @@
 #include "imgui_impl_opengl3.h"
 #include <iostream>
 
-
-GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, map<string, float>& data_map,
-                       mutex& data_mutex, TemperatureStatistics& tempStats)
-        : database(db), sensorManager(sm), queueManager(qm), temp_map(data_map), nodeDataMutex(data_mutex),
-          uiObserver(temp_map, nodeDataMutex), tempStats(tempStats), isMeasuring(false), showGraph(false),
-          window(nullptr), glsl_version(nullptr) {
-
+GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, Statistic& statistic,map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info, TemperatureStatistics& tempStats)
+        : database(db), sensorManager(sm), queueManager(qm), statistics(statistic), temp_map(data_map), nodeDataMutex(data_mutex), sensor_info(sensor_info),
+            uiObserver(temp_map, nodeDataMutex), tempStats(tempStats),
+          isMeasuring(false), showGraph(false), window(nullptr), glsl_version(nullptr) {
     // Add the observer to the queue
     queueManager.add_observer(&uiObserver);
 
@@ -87,8 +84,9 @@ void GUIManager::render() {
     // Render plots after stopping measurements
     if (showGraph) {
         renderPlots();
-        //Min, max, ave values
+        //Min, max, ave values and trend
         displayStatistics();
+        display_predict_temp();
     }
 
     // Render GUI
@@ -229,6 +227,14 @@ void GUIManager::displayStatistics() {
     ImGui::Text("  Minimum Temperature: %.2f °C", globalMin);
     ImGui::Text("  Maximum Temperature: %.2f °C", globalMax);
     ImGui::Text("  Average Temperature: %.2f °C", globalAvg);
+}
+
+void GUIManager::display_predict_temp() {
+    for(auto &sensor: sensor_info){
+        float predict_value=-100;
+        statistics.predict_future_temp(sensor.name, static_cast<uint64_t>(sensor.interval), predict_value);
+        ImGui::Text("Prediction: %s: %.2f °C ", sensor.name.c_str(), predict_value);
+    }
 }
 
 void GUIManager::cleanup_gui() {

@@ -70,6 +70,10 @@ add_executable(DataStructureAlgorithmsProject
         GUIManager.cpp
         TemperatureStatistics.h
         TemperatureStatistics.cpp
+        LinearRegression.cpp
+        LinearRegression.h
+        Statistic.h
+        Statistic.cpp
 )
 
 target_include_directories(DataStructureAlgorithmsProject PRIVATE /usr/local/include)
