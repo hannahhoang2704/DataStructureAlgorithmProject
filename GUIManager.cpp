@@ -151,10 +151,11 @@ void GUIManager::renderPlotsAndStats() {
         ImGui::Spacing();
 
         float sensor1Prediction = display_predict_temp("sensor1");
-        ImGui::Text("Sensor1 prediction: %.2f °C", sensor1Prediction);
+        ImGui::Text(" Sensor1 prediction: %.2f °C", sensor1Prediction);
 
         ImGui::Spacing();
         ImGui::Spacing();
+        ImGui::Separator();
     }
 
     // Plot Sensor 2
@@ -180,10 +181,11 @@ void GUIManager::renderPlotsAndStats() {
         ImGui::Spacing();
 
         float sensor2Prediction = display_predict_temp("sensor2");
-        ImGui::Text("Sensor2 prediction: %.2f °C", sensor2Prediction);
+        ImGui::Text(" Sensor2 prediction: %.2f °C", sensor2Prediction);
 
         ImGui::Spacing();
         ImGui::Spacing();
+        ImGui::Separator();
     }
 
     // Plot Sensor 3
@@ -209,10 +211,11 @@ void GUIManager::renderPlotsAndStats() {
         ImGui::Spacing();
 
         float sensor3Prediction = display_predict_temp("sensor3");
-        ImGui::Text("Sensor3 prediction: %.2f °C", sensor3Prediction);
+        ImGui::Text(" Sensor3 prediction: %.2f °C", sensor3Prediction);
 
         ImGui::Spacing();
         ImGui::Spacing();
+        ImGui::Separator();
     }
 }
 
