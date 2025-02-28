@@ -4,6 +4,9 @@
 
 #include "TemperatureStatistics.h"
 #include <stdexcept>
+#include <iomanip>
+#include <sstream>
+#include <ctime>
 
 
 TemperatureStatistics::TemperatureStatistics(DatabaseStorage* dbStorage) : databaseStorage(dbStorage) {}
@@ -43,7 +46,7 @@ pair<float, string> TemperatureStatistics::getMinTemperatureWithTimestamp(const 
     auto minIter = min_element(temps.begin(), temps.end());
     size_t minIndex = distance(temps.begin(), minIter);
 
-    uint64_t rawTimestamp = timestamps[minIndex];
+    time_t rawTimestamp = timestamps[minIndex];
 
     return {*minIter, formatTimestamp(rawTimestamp)};
 }
@@ -139,7 +142,7 @@ std::string formatTimestamp(std::time_t rawTimestamp) {
     std::tm localTime;
     char buffer[80];
 
-    if (localtime_s(&localTime, &rawTimestamp) == 0) {
+    if (localtime_r(&localTime, &rawTimestamp) == 0) {
         std::ostringstream oss;
         oss << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S");
         return oss.str();
