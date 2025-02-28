@@ -23,7 +23,7 @@ void DatabaseStorage::write_database() {
         InfoNode node;
         if(queue_manager.pop_data(node)){
             lock_guard<mutex> lock(file_lock);
-            data_container[node.name][node.timestamps] = node.temp;
+            data_container[node.name].push_back({node.timestamps, node.temp});
 
             ofstream write_file(file_path);
             if(write_file.is_open()){
