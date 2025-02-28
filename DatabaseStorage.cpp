@@ -18,6 +18,11 @@ void DatabaseStorage::start_write_thread() {
     cout << "Start database writer thread " << endl;
 }
 
+void DatabaseStorage::stop_write_thread() {
+    running = false;
+    if(database_writer.joinable()) database_writer.join();
+}
+
 void DatabaseStorage::write_database() {
     while (running) {
         InfoNode node;
