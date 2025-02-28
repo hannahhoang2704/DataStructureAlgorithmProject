@@ -14,7 +14,7 @@ public:
     string name;
     uint64_t timestamps;
     float temp;
-    InfoNode(string sensor_name="", uint64_t time=0, int value=0): name(std::move(sensor_name)), timestamps(time), temp(value){};
+    InfoNode(string sensor_name="", uint64_t time=0, float value=0): name(std::move(sensor_name)), timestamps(time), temp(value){};
     InfoNode& operator=(const InfoNode& node){
         name = node.name;
         timestamps = node.timestamps;
