@@ -151,6 +151,11 @@ void GUIManager::renderPlots() {
         ImGui::Text("  Sensor1 Min: %.2f °C (At %s) | Sensor1 Max: %.2f °C (At %s) | Sensor1 Avg: %.2f °C",
                     sensor1Min, min1TimestampStr.c_str(), sensor1Max, max1TimestampStr.c_str(), sensor1Ave);
         ImGui::Spacing();
+
+        float sensor1Prediction = display_predict_temp("sensor1");
+        ImGui::Text("Sensor1 prediction: %.2f °C", sensor1Prediction);
+
+        ImGui::Spacing();
         ImGui::Spacing();
     }
 
@@ -175,6 +180,11 @@ void GUIManager::renderPlots() {
         ImGui::Text("  Sensor2 Min: %.2f °C (At %s) | Sensor2 Max: %.2f °C (At %s) | Sensor2 Avg: %.2f °C",
                     sensor2Min, min2TimestampStr.c_str(), sensor2Max, min2TimestampStr.c_str(), sensor2Ave);
         ImGui::Spacing();
+
+        float sensor2Prediction = display_predict_temp("sensor2");
+        ImGui::Text("Sensor2 prediction: %.2f °C", sensor2Prediction);
+
+        ImGui::Spacing();
         ImGui::Spacing();
     }
 
@@ -198,6 +208,11 @@ void GUIManager::renderPlots() {
 
         ImGui::Text("  Sensor3 Min: %.2f °C (At %s) | Sensor3 Max: %.2f °C (At %s) | Sensor3 Avg: %.2f °C",
                     sensor3Min, min3TimestampStr.c_str(), sensor3Max, min3TimestampStr.c_str(), sensor3Ave);
+        ImGui::Spacing();
+
+        float sensor3Prediction = display_predict_temp("sensor3");
+        ImGui::Text("Sensor3 prediction: %.2f °C", sensor3Prediction);
+
         ImGui::Spacing();
         ImGui::Spacing();
     }
@@ -251,11 +266,11 @@ void GUIManager::displayStatistics() {
     ImGui::Spacing();
 }
 
-void GUIManager::display_predict_temp() {
+float GUIManager::display_predict_temp(string sensorName) {
     for(auto &sensor: sensor_info){
         float predict_value=-100;
-        statistics.predict_future_temp(sensor.name, static_cast<uint64_t>(sensor.interval), predict_value);
-        ImGui::Text("Prediction: %s: %.2f °C ", sensor.name.c_str(), predict_value);
+        statistics.predict_future_temp(sensorName, static_cast<uint64_t>(sensor.interval), predict_value);
+        return predict_value;
     }
 }
 
