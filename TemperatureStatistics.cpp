@@ -46,7 +46,7 @@ pair<float, string> TemperatureStatistics::getMinTemperatureWithTimestamp(const 
     auto minIter = min_element(temps.begin(), temps.end());
     size_t minIndex = distance(temps.begin(), minIter);
 
-    time_t rawTimestamp = timestamps[minIndex];
+    uint64_t rawTimestamp = timestamps[minIndex];
 
     return {*minIter, formatTimestamp(rawTimestamp)};
 }
@@ -138,18 +138,18 @@ float TemperatureStatistics::getAverageTemperatureAllSensors() {
     return totalSum / totalCount;
 }
 
-std::string formatTimestamp(std::time_t rawTimestamp) {
+std::string TemperatureStatistics::formatTimestamp(uint64_t rawTimestamp) {
+    std::time_t timeT = static_cast<std::time_t>(rawTimestamp);
     std::tm localTime;
-    char buffer[80];
 
-    if (localtime_r(&localTime, &rawTimestamp) == 0) {
+    if (localtime_r(&timeT, &localTime)) {
         std::ostringstream oss;
         oss << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S");
         return oss.str();
-    } else {
-        return "Invalid Time";
     }
+    return "Invalid Time";
 }
+
 
 
 void TemperatureStatistics::clearData() {
