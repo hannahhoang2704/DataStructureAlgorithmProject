@@ -52,6 +52,7 @@ void GUIManager::initialize_gui() {
 
     // Create GLFW window
     window = glfwCreateWindow(1280, 720, "Temperature Sensors GUI", nullptr, nullptr);
+    glfwSetWindowTitle(window, "Temperature Sensors GUI");
     if (!window) {
         glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window");
