@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <sstream>
 
+
 TemperatureStatistics::TemperatureStatistics(DatabaseStorage* dbStorage) : databaseStorage(dbStorage) {}
 
 void TemperatureStatistics::addSensorData(const string& sensorName, const vector<float>& temps, const vector<uint64_t>& timestamps) {
@@ -46,7 +47,12 @@ pair<float, string> TemperatureStatistics::getMinTemperatureWithTimestamp(const 
 
     uint64_t rawTimestamp = timestamps[minIndex];
 
-    return {*minIter, formatTimestamp(rawTimestamp)};
+    // Convert raw timestamp to formatted string
+    std::time_t timeT = static_cast<std::time_t>(rawTimestamp);
+    std::ostringstream oss;
+    oss << std::put_time(std::localtime(&timeT), "%Y-%m-%d %H:%M:%S");
+
+    return {*minIter, oss.str()};
 }
 
 
@@ -65,7 +71,12 @@ pair<float, string> TemperatureStatistics::getMaxTemperatureWithTimestamp(const 
 
     uint64_t rawTimestamp = timestamps[maxIndex];
 
-    return {*maxIter, formatTimestamp(rawTimestamp)};
+    // Convert raw timestamp to formatted string
+    std::time_t timeT = static_cast<std::time_t>(rawTimestamp);
+    std::ostringstream oss;
+    oss << std::put_time(std::localtime(&timeT), "%Y-%m-%d %H:%M:%S");
+
+    return {*maxIter, oss.str()};
 }
 
 
@@ -139,17 +150,14 @@ float TemperatureStatistics::getAverageTemperatureAllSensors() {
 std::string TemperatureStatistics::formatTimestamp(uint64_t rawTimestamp) {
     std::time_t time = static_cast<std::time_t>(rawTimestamp);
 
-    std::tm* tm = std::localtime(&time);
-
-    if (!tm) {
-        return "Invalid Time";
+    std::ostringstream formattedTime;
+    std::tm* localTime = std::localtime(&time);
+    if (localTime) {
+        formattedTime << std::put_time(localTime, "%Y-%m-%d %H:%M:%S");
+        return formattedTime.str();
     }
-
-    std::ostringstream oss;
-    oss << std::put_time(tm, "%Y-%m-%d %H:%M:%S");
-    return oss.str();
+    return "Invalid Time";
 }
-
 
 
 void TemperatureStatistics::clearData() {

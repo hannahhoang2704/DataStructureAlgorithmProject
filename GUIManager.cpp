@@ -223,10 +223,14 @@ void GUIManager::displayStatistics() {
     float globalAvg = tempStats.getAverageTemperatureAllSensors();
 
     // Display the summary
+    ImGui::Spacing();
+    ImGui::Spacing();
     ImGui::Text("Summary of All Sensors:");
     ImGui::Text("  Minimum Temperature: %.2f °C", globalMin);
     ImGui::Text("  Maximum Temperature: %.2f °C", globalMax);
     ImGui::Text("  Average Temperature: %.2f °C", globalAvg);
+    ImGui::Spacing();
+    ImGui::Spacing();
 }
 
 void GUIManager::display_predict_temp() {
