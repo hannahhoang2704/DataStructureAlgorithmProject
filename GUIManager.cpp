@@ -177,7 +177,7 @@ void GUIManager::renderPlotsAndStats() {
         std::string max2TimestampStr = max2Timestamp;
 
         ImGui::Text("  Sensor2 Min: %.2f °C (At %s) | Sensor2 Max: %.2f °C (At %s) | Sensor2 Avg: %.2f °C",
-                    sensor2Min, min2TimestampStr.c_str(), sensor2Max, min2TimestampStr.c_str(), sensor2Ave);
+                    sensor2Min, min2TimestampStr.c_str(), sensor2Max, max2TimestampStr.c_str(), sensor2Ave);
         ImGui::Spacing();
 
         float sensor2Prediction = display_predict_temp("sensor2");
@@ -207,7 +207,7 @@ void GUIManager::renderPlotsAndStats() {
         std::string max3TimestampStr = max3Timestamp;
 
         ImGui::Text("  Sensor3 Min: %.2f °C (At %s) | Sensor3 Max: %.2f °C (At %s) | Sensor3 Avg: %.2f °C",
-                    sensor3Min, min3TimestampStr.c_str(), sensor3Max, min3TimestampStr.c_str(), sensor3Ave);
+                    sensor3Min, min3TimestampStr.c_str(), sensor3Max, max3TimestampStr.c_str(), sensor3Ave);
         ImGui::Spacing();
 
         float sensor3Prediction = display_predict_temp("sensor3");
