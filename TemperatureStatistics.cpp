@@ -24,9 +24,14 @@ void TemperatureStatistics::loadDataFromDatabase() {
         throw runtime_error("DatabaseStorage instance is not initialized");
     }
 
+    // Check if data is already loaded
+    if (!sensorTemperatures.empty() && !sensorTimestamps.empty()) {
+        return; // Data is already loaded, no need to reload
+    }
+
     auto [timestamps, values] = databaseStorage->read_database();
 
-    // Clear any existing data and populate new data
+    // Clear existing data and populate new data
     clearData();
     for (const auto& [sensorName, temps] : values) {
         addSensorData(sensorName, temps, timestamps[sensorName]);
@@ -44,6 +49,9 @@ pair<float, string> TemperatureStatistics::getMinTemperatureWithTimestamp(const 
     const auto& temps = sensorIt->second;
     const auto& timestamps = sensorTimestamps.at(sensorName);
     auto minIter = min_element(temps.begin(), temps.end());
+    if (minIter == temps.end()) {
+        throw runtime_error("No data available to find minimum temperature for sensor: " + sensorName);
+    }
     size_t minIndex = distance(temps.begin(), minIter);
 
     uint64_t rawTimestamp = timestamps[minIndex];
@@ -63,6 +71,9 @@ pair<float, string> TemperatureStatistics::getMaxTemperatureWithTimestamp(const 
     const auto& temps = sensorIt->second;
     const auto& timestamps = sensorTimestamps.at(sensorName);
     auto maxIter = max_element(temps.begin(), temps.end());
+    if (maxIter == temps.end()) {
+        throw runtime_error("No data available to find maximum temperature for sensor: " + sensorName);
+    }
     size_t maxIndex = distance(temps.begin(), maxIter);
 
     uint64_t rawTimestamp = timestamps[maxIndex];
