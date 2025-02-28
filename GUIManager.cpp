@@ -11,7 +11,7 @@
 GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, Statistic& statistic, map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info, TemperatureStatistics& tempStats)
         : database(db), sensorManager(sm), queueManager(qm), statistics(statistic), temp_map(data_map), nodeDataMutex(data_mutex), sensor_info(sensor_info),
             uiObserver(temp_map, nodeDataMutex), tempStats(tempStats),
-          isMeasuring(false), showGraph(false), window(nullptr), glsl_version(nullptr) {
+          isMeasuring(false), showStats(false), window(nullptr), glsl_version(nullptr) {
     // Add the observer to the queue
     queueManager.add_observer(&uiObserver);
 
@@ -52,7 +52,6 @@ void GUIManager::initialize_gui() {
 
     // Create GLFW window
     window = glfwCreateWindow(1280, 720, "Temperature Sensors GUI", nullptr, nullptr);
-    glfwSetWindowTitle(window, "Temperature Sensors GUI");
     if (!window) {
         glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window");
@@ -73,6 +72,11 @@ void GUIManager::render() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+    // create a top-level window that fills the screen
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+    ImGui::Begin("Main Content", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
 
     // Render real-time values if measuring
     if (isMeasuring) {
@@ -82,13 +86,15 @@ void GUIManager::render() {
     // Render Start/Stop controls
     renderControls();
 
-    // Render plots after stopping measurements
-    if (showGraph) {
+    // Render plots and statistics after stopping measurements
+    if (showStats) {
         renderPlots();
-        //Min, max, ave values and trend
+        //Min, max, average values and trend
         displayStatistics();
         display_predict_temp();
     }
+
+    ImGui::End();
 
     // Render GUI
     ImGui::Render();
@@ -205,7 +211,7 @@ void GUIManager::handleStartMeasurement() {
 
     // Update state
     isMeasuring = true;
-    showGraph = false;
+    showStats = false;
 }
 
 void GUIManager::handleStopMeasurement() {
@@ -216,7 +222,7 @@ void GUIManager::handleStopMeasurement() {
     // Update plot data and state
     updatePlotData();
     isMeasuring = false;
-    showGraph = true;
+    showStats = true;
 }
 
 void GUIManager::updatePlotData() {
