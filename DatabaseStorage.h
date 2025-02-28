@@ -33,7 +33,7 @@ private:
     QueueManager& queue_manager;
     bool running;
     json json_data = json{};
-    map<string, map<uint64_t , int>> data_container;
+    map<string, map<uint64_t , float>> data_container;
     mutex file_lock;
     thread database_writer;
     void write_database();
