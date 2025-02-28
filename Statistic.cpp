@@ -26,4 +26,5 @@ bool Statistic::predict_future_temp(const std::string &sensor, uint64_t interval
         return false;
     }
     predict_temp_val = linear_regression.predict_future(future_timestamp, sensor_timestamps[data_size-5]);
+    return true;
 }
