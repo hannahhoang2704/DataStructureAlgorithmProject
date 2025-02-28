@@ -88,10 +88,8 @@ void GUIManager::render() {
 
     // Render plots and statistics after stopping measurements
     if (showStats) {
-        renderPlots();
-        //Min, max, average values and trend
+        renderPlotsAndStats();
         displayStatistics();
-        display_predict_temp();
     }
 
     ImGui::End();
@@ -128,7 +126,7 @@ void GUIManager::renderRealTimeValues() {
 }
 
 
-void GUIManager::renderPlots() {
+void GUIManager::renderPlotsAndStats() {
 
     // Plot Sensor 1
     if (!values1.empty()) {
@@ -272,6 +270,7 @@ float GUIManager::display_predict_temp(string sensorName) {
         statistics.predict_future_temp(sensorName, static_cast<uint64_t>(sensor.interval), predict_value);
         return predict_value;
     }
+    return -100; // in case no matching sensor is found
 }
 
 void GUIManager::cleanup_gui() {

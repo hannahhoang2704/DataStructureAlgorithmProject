@@ -40,10 +40,10 @@ private:
 
     // Helper functions
     void renderControls();
-    void renderPlots();
+    void renderPlotsAndStats();
     void renderRealTimeValues();
     void updatePlotData();
-    void display_predict_temp(string sensorName);
+    float display_predict_temp(string sensorName);
     void displayStatistics();
 
 public:
