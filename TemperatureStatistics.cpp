@@ -139,15 +139,19 @@ float TemperatureStatistics::getAverageTemperatureAllSensors() {
 }
 
 std::string TemperatureStatistics::formatTimestamp(uint64_t rawTimestamp) {
+    if (rawTimestamp == 0) {
+        return "Invalid Timestamp";
+    }
+
     std::time_t timeT = static_cast<std::time_t>(rawTimestamp);
     std::tm localTime;
+    std::ostringstream oss;
 
     if (localtime_r(&timeT, &localTime)) {
-        std::ostringstream oss;
         oss << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S");
         return oss.str();
     }
-    return "Invalid Time";
+    return "Invalid Timestamp";
 }
 
 

@@ -137,8 +137,12 @@ void GUIManager::renderPlots() {
         auto [sensor1Min, min1Timestamp] = tempStats.getMinTemperatureWithTimestamp("sensor1");
         auto [sensor1Max, max1Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor1");
         float sensor1Ave = tempStats.getAverageTemperature("sensor1");
+
+        std::string min1TimestampStr = min1Timestamp;
+        std::string max1TimestampStr = max1Timestamp;
+
         ImGui::Text("  Sensor1 Min: %.2f °C (At %s) | Sensor1 Max: %.2f °C (At %s) | Sensor1 Avg: %.2f °C",
-                    sensor1Min, min1Timestamp, sensor1Max, max1Timestamp, sensor1Ave);
+                    sensor1Min, min1TimestampStr.c_str(), sensor1Max, max1TimestampStr.c_str(), sensor1Ave);
         ImGui::Spacing();
         ImGui::Spacing();
     }
@@ -157,8 +161,12 @@ void GUIManager::renderPlots() {
         auto [sensor2Min, min2Timestamp] = tempStats.getMinTemperatureWithTimestamp("sensor2");
         auto [sensor2Max, max2Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor2");
         float sensor2Ave = tempStats.getAverageTemperature("sensor2");
+
+        std::string min2TimestampStr = min2Timestamp;
+        std::string max2TimestampStr = max2Timestamp;
+
         ImGui::Text("  Sensor2 Min: %.2f °C (At %s) | Sensor2 Max: %.2f °C (At %s) | Sensor2 Avg: %.2f °C",
-                    sensor2Min, min2Timestamp, sensor2Max, max2Timestamp, sensor2Ave);
+                    sensor2Min, min2TimestampStr.c_str(), sensor2Max, min2TimestampStr.c_str(), sensor2Ave);
         ImGui::Spacing();
         ImGui::Spacing();
     }
@@ -178,8 +186,11 @@ void GUIManager::renderPlots() {
         auto [sensor3Max, max3Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor3");
         float sensor3Ave = tempStats.getAverageTemperature("sensor3");
 
+        std::string min3TimestampStr = min3Timestamp;
+        std::string max3TimestampStr = max3Timestamp;
+
         ImGui::Text("  Sensor3 Min: %.2f °C (At %s) | Sensor3 Max: %.2f °C (At %s) | Sensor3 Avg: %.2f °C",
-                    sensor3Min, min3Timestamp, sensor3Max, max3Timestamp, sensor3Ave);
+                    sensor3Min, min3TimestampStr.c_str(), sensor3Max, min3TimestampStr.c_str(), sensor3Ave);
         ImGui::Spacing();
         ImGui::Spacing();
     }
