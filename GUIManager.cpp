@@ -8,7 +8,7 @@
 #include "imgui_impl_opengl3.h"
 #include <iostream>
 
-GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, Statistic& statistic,map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info, TemperatureStatistics& tempStats)
+GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, Statistic& statistic, map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info, TemperatureStatistics& tempStats)
         : database(db), sensorManager(sm), queueManager(qm), statistics(statistic), temp_map(data_map), nodeDataMutex(data_mutex), sensor_info(sensor_info),
             uiObserver(temp_map, nodeDataMutex), tempStats(tempStats),
           isMeasuring(false), showGraph(false), window(nullptr), glsl_version(nullptr) {
@@ -222,9 +222,9 @@ void GUIManager::updatePlotData() {
     auto [timestamps, values] = database.read_database();
 
     // Prepare data for plotting
-    database.preparePlotData("sensor1", timestamps, values, time1, values1);
-    database.preparePlotData("sensor2", timestamps, values, time2, values2);
-    database.preparePlotData("sensor3", timestamps, values, time3, values3);
+    statistics.preparePlotData("sensor1", timestamps, values, time1, values1);
+    statistics.preparePlotData("sensor2", timestamps, values, time2, values2);
+    statistics.preparePlotData("sensor3", timestamps, values, time3, values3);
 }
 
 void GUIManager::displayStatistics() {

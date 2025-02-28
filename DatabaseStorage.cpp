@@ -102,7 +102,7 @@ pair<map<string, vector<uint64_t>>, map<string, vector<float>>> DatabaseStorage:
     return {sensorTimestamps, sensorValues};
 }
 
-void DatabaseStorage::preparePlotData(
+/*void DatabaseStorage::preparePlotData(
         const std::string &sensorName,
         const map<std::string, vector<uint64_t>> &timestamps,
         const map<std::string, vector<float>> &values,
@@ -135,3 +135,4 @@ void DatabaseStorage::preparePlotData(
         sensorValues.push_back(rawValues[i]);
     }
 }
+*/

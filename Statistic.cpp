@@ -28,3 +28,38 @@ bool Statistic::predict_future_temp(const std::string &sensor, uint64_t interval
     predict_temp_val = linear_regression.predict_future(future_timestamp, sensor_timestamps[data_size-5]);
     return true;
 }
+
+void Statistic::preparePlotData(
+        const std::string &sensorName,
+        const map<std::string, vector<uint64_t>> &timestamps,
+        const map<std::string, vector<float>> &values,
+        vector<float> &timeInSeconds,
+        vector<float> &sensorValues
+) {
+    timeInSeconds.clear();
+    sensorValues.clear();
+
+    auto timeIter = timestamps.find(sensorName);
+    auto valueIter = values.find(sensorName);
+
+    if (timeIter == timestamps.end() || valueIter == values.end()) {
+        cerr << "Sensor data not found for sensor: " << sensorName << endl;
+        return;
+    }
+
+    const auto& rawTimestamps = timeIter->second;
+    const auto& rawValues = valueIter->second;
+
+    if (rawTimestamps.size() != rawValues.size()) {
+        cerr << "Mismatch in timestamps and values size for sensor: " << sensorName << endl;
+        return;
+    }
+
+    uint64_t startTime = rawTimestamps.front();
+    for (size_t i = 0; i < rawTimestamps.size(); ++i) {
+        float timeInSecondsValue = (rawTimestamps[i] - startTime) / 1000.0f; // Convert to seconds
+        timeInSeconds.push_back(timeInSecondsValue);
+        sensorValues.push_back(rawValues[i]);
+    }
+    cout << "Prepared data for sensor: " << sensorName << endl;
+}

@@ -23,10 +23,10 @@ public:
     pair<map<string, vector<uint64_t>>, map<string, vector<float>>> read_database(); //returns parsed JSON data as a pair of maps for timestamps and values
     void start_write_thread();
     void stop_write_thread();
-    void preparePlotData(const string& sensorName,
+    /*void preparePlotData(const string& sensorName,
                          const map<string, vector<uint64_t>>& timestamps,
                          const map<string, vector<float>>& values,
-                         vector<float>& timeInSeconds, vector<float>& sensorValues);
+                         vector<float>& timeInSeconds, vector<float>& sensorValues);*/
 
 private:
     string file_path;
