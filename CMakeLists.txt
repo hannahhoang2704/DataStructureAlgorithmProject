@@ -68,6 +68,8 @@ add_executable(DataStructureAlgorithmsProject
         Observer.h
         GUIManager.h
         GUIManager.cpp
+        TemperatureStatistics.h
+        TemperatureStatistics.cpp
         LinearRegression.cpp
         LinearRegression.h
         Statistic.h

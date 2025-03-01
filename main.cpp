@@ -7,6 +7,7 @@
 #include "TemperatureSensor.h"
 #include "Statistic.h"
 #include "LinearRegression.h"
+#include "TemperatureStatistics.h"
 
 using namespace std;
 
@@ -17,28 +18,25 @@ int main() {
         QueueManager queue_manager;
         DatabaseStorage database(json_file_path, queue_manager);
         SensorManager sensor_manager;
+        TemperatureStatistics tempStats(&database);
         LinearRegression linear_regression;
         Statistic statistics(linear_regression, database);
 
         std::vector<SensorInfo> sensors_config = {
                 {"sensor1", "28-00000087fb7c", 2},
-                {"sensor2", "28-00000085e6ff", 3},
+                {"sensor2", "28-00000085e6ff", 2},
                 {"sensor3", "28-000000849be2", 2}
         };
-
         // Add sensors
         for (const auto& sensor : sensors_config) {
             sensor_manager.addSensor(new TemperatureSensor(sensor.name, sensor.fileName, queue_manager, sensor.interval));
         }
 
-//        sensor_manager.addSensor(new TemperatureSensor("sensor1", "28-00000087fb7c", queue_manager, 2));
-//        sensor_manager.addSensor(new TemperatureSensor("sensor2", "28-00000085e6ff", queue_manager, 3));
-//        sensor_manager.addSensor(new TemperatureSensor("sensor3", "28-000000849be2", queue_manager,2));
         map<string, float> sensors_data;
         mutex sensor_data_mutex;
-
+    
         // Initialize GUIManager
-        GUIManager gui_manager(database, sensor_manager, queue_manager, statistics, sensors_data, sensor_data_mutex, sensors_config);
+        GUIManager gui_manager(database, sensor_manager, queue_manager, statistics, sensors_data, sensor_data_mutex, sensors_config, tempStats);
         gui_manager.initialize_gui();
 
         // Main loop

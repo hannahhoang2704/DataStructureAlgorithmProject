@@ -8,10 +8,10 @@
 #include "imgui_impl_opengl3.h"
 #include <iostream>
 
-GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, Statistic& statistic,map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info)
+GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, Statistic& statistic, map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info, TemperatureStatistics& tempStats)
         : database(db), sensorManager(sm), queueManager(qm), statistics(statistic), temp_map(data_map), nodeDataMutex(data_mutex), sensor_info(sensor_info),
-            uiObserver(temp_map, nodeDataMutex),
-          isMeasuring(false), showGraph(false), window(nullptr), glsl_version(nullptr) {
+            uiObserver(temp_map, nodeDataMutex), tempStats(tempStats),
+          isMeasuring(false), showStats(false), window(nullptr), glsl_version(nullptr) {
     // Add the observer to the queue
     queueManager.add_observer(&uiObserver);
 
@@ -72,6 +72,11 @@ void GUIManager::render() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+    // create a top-level window that fills the screen
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+    ImGui::Begin("Main Content", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
 
     // Render real-time values if measuring
     if (isMeasuring) {
@@ -81,11 +86,13 @@ void GUIManager::render() {
     // Render Start/Stop controls
     renderControls();
 
-    // Render plots after stopping measurements
-    if (showGraph) {
-        renderPlots();
-        display_predict_temp();
+    // Render plots and statistics after stopping measurements
+    if (showStats) {
+        renderPlotsAndStats();
+        displayStatistics();
     }
+
+    ImGui::End();
 
     // Render GUI
     ImGui::Render();
@@ -98,7 +105,6 @@ void GUIManager::render() {
 }
 
 void GUIManager::renderControls() {
-    //ImGui::Begin("Measurement Controls");
 
     if (!isMeasuring) {
         if (ImGui::Button("Start Measurement")) {
@@ -109,8 +115,6 @@ void GUIManager::renderControls() {
             handleStopMeasurement();
         }
     }
-
-    //ImGui::End();
 }
 
 void GUIManager::renderRealTimeValues() {
@@ -122,8 +126,7 @@ void GUIManager::renderRealTimeValues() {
 }
 
 
-void GUIManager::renderPlots() {
-    //ImGui::Begin("Sensor Data");
+void GUIManager::renderPlotsAndStats() {
 
     // Plot Sensor 1
     if (!values1.empty()) {
@@ -134,6 +137,25 @@ void GUIManager::renderPlots() {
 
         ImGui::Text("Sensor 1");
         ImGui::PlotLines("Temp 1", values1.data(), static_cast<int>(values1.size()), 0, nullptr, min1, max1, ImVec2(0, 200));
+
+        ImGui::Spacing();
+        auto [sensor1Min, min1Timestamp] = tempStats.getMinTemperatureWithTimestamp("sensor1");
+        auto [sensor1Max, max1Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor1");
+        float sensor1Ave = tempStats.getAverageTemperature("sensor1");
+
+        std::string min1TimestampStr = min1Timestamp;
+        std::string max1TimestampStr = max1Timestamp;
+
+        ImGui::Text("  Sensor1 Min: %.2f °C (At %s) | Sensor1 Max: %.2f °C (At %s) | Sensor1 Avg: %.2f °C",
+                    sensor1Min, min1TimestampStr.c_str(), sensor1Max, max1TimestampStr.c_str(), sensor1Ave);
+        ImGui::Spacing();
+
+        float sensor1Prediction = display_predict_temp("sensor1");
+        ImGui::Text(" Sensor1 prediction: %.2f °C", sensor1Prediction);
+
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Separator();
     }
 
     // Plot Sensor 2
@@ -145,6 +167,25 @@ void GUIManager::renderPlots() {
 
         ImGui::Text("Sensor 2");
         ImGui::PlotLines("Temp 2", values2.data(), static_cast<int>(values2.size()), 0, nullptr, min2, max2, ImVec2(0, 200));
+
+        ImGui::Spacing();
+        auto [sensor2Min, min2Timestamp] = tempStats.getMinTemperatureWithTimestamp("sensor2");
+        auto [sensor2Max, max2Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor2");
+        float sensor2Ave = tempStats.getAverageTemperature("sensor2");
+
+        std::string min2TimestampStr = min2Timestamp;
+        std::string max2TimestampStr = max2Timestamp;
+
+        ImGui::Text("  Sensor2 Min: %.2f °C (At %s) | Sensor2 Max: %.2f °C (At %s) | Sensor2 Avg: %.2f °C",
+                    sensor2Min, min2TimestampStr.c_str(), sensor2Max, max2TimestampStr.c_str(), sensor2Ave);
+        ImGui::Spacing();
+
+        float sensor2Prediction = display_predict_temp("sensor2");
+        ImGui::Text(" Sensor2 prediction: %.2f °C", sensor2Prediction);
+
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Separator();
     }
 
     // Plot Sensor 3
@@ -156,9 +197,26 @@ void GUIManager::renderPlots() {
 
         ImGui::Text("Sensor 3");
         ImGui::PlotLines("Temp 3", values3.data(), static_cast<int>(values3.size()), 0, nullptr, min3, max3, ImVec2(0, 200));
-    }
 
-    //ImGui::End();
+        ImGui::Spacing();
+        auto [sensor3Min, min3Timestamp] = tempStats.getMinTemperatureWithTimestamp("sensor3");
+        auto [sensor3Max, max3Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor3");
+        float sensor3Ave = tempStats.getAverageTemperature("sensor3");
+
+        std::string min3TimestampStr = min3Timestamp;
+        std::string max3TimestampStr = max3Timestamp;
+
+        ImGui::Text("  Sensor3 Min: %.2f °C (At %s) | Sensor3 Max: %.2f °C (At %s) | Sensor3 Avg: %.2f °C",
+                    sensor3Min, min3TimestampStr.c_str(), sensor3Max, max3TimestampStr.c_str(), sensor3Ave);
+        ImGui::Spacing();
+
+        float sensor3Prediction = display_predict_temp("sensor3");
+        ImGui::Text(" Sensor3 prediction: %.2f °C", sensor3Prediction);
+
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Separator();
+    }
 }
 
 
@@ -169,7 +227,7 @@ void GUIManager::handleStartMeasurement() {
 
     // Update state
     isMeasuring = true;
-    showGraph = false;
+    showStats = false;
 }
 
 void GUIManager::handleStopMeasurement() {
@@ -180,26 +238,43 @@ void GUIManager::handleStopMeasurement() {
     // Update plot data and state
     updatePlotData();
     isMeasuring = false;
-    showGraph = true;
+    showStats = true;
 }
 
 void GUIManager::updatePlotData() {
-    auto [timestamps, values] = database.read_database();
+    auto [timestamps, values] = database.process_data();
 
     // Prepare data for plotting
-    database.preparePlotData("sensor1", timestamps, values, time1, values1);
-    database.preparePlotData("sensor2", timestamps, values, time2, values2);
-    database.preparePlotData("sensor3", timestamps, values, time3, values3);
+    statistics.preparePlotData("sensor1", timestamps, values, time1, values1);
+    statistics.preparePlotData("sensor2", timestamps, values, time2, values2);
+    statistics.preparePlotData("sensor3", timestamps, values, time3, values3);
 }
 
-void GUIManager::display_predict_temp() {
+void GUIManager::displayStatistics() {
+    ImGui::Separator();
+    float globalMin = tempStats.getMinTemperature();
+    float globalMax = tempStats.getMaxTemperature();
+    float globalAvg = tempStats.getAverageTemperatureAllSensors();
+
+    // Display the summary
+    ImGui::Spacing();
+    ImGui::Spacing();
+    ImGui::Text("Summary of All Sensors:");
+    ImGui::Text("  Minimum Temperature: %.2f °C", globalMin);
+    ImGui::Text("  Maximum Temperature: %.2f °C", globalMax);
+    ImGui::Text("  Average Temperature: %.2f °C", globalAvg);
+    ImGui::Spacing();
+    ImGui::Spacing();
+}
+
+float GUIManager::display_predict_temp(string sensorName) {
     for(auto &sensor: sensor_info){
         float predict_value=-100;
-        statistics.predict_future_temp(sensor.name, static_cast<uint64_t>(sensor.interval), predict_value);
-        ImGui::Text("Prediction: %s: %.2f °C ", sensor.name.c_str(), predict_value);
+        statistics.predict_future_temp(sensorName, static_cast<uint64_t>(sensor.interval), predict_value);
+        return predict_value;
     }
+    return -100; // in case no matching sensor is found
 }
-
 
 void GUIManager::cleanup_gui() {
     ImGui_ImplOpenGL3_Shutdown();
