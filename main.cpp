@@ -23,7 +23,7 @@ int main() {
         std::vector<SensorInfo> sensors_config = {
                 {"sensor1", "28-00000087fb7c", 2},
                 {"sensor2", "28-00000085e6ff", 2},
-                {"sensor3", "28-000000849be2", 2}
+                {"sensor3", "28-000000849be2", 4}
         };
         // Add sensors
         for (const auto& sensor : sensors_config) {

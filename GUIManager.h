@@ -39,10 +39,10 @@ private:
     // Helper functions
     void renderControls();
     void renderPlotsAndStats();
-    void renderPlotAndStatsForSensor(const string sensorName, vector<float> &value);
+    void renderPlotAndStatsForSensor(const string& sensorName, vector<float> &value);
     void renderRealTimeValues();
     void updatePlotData();
-    float display_predict_temp(string sensorName);
+    float display_predict_temp(const string& sensorName);
     void displayStatistics();
 
 public:

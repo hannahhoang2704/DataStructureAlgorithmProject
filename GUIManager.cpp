@@ -132,7 +132,7 @@ void GUIManager::renderPlotsAndStats() {
     renderPlotAndStatsForSensor("sensor3", values3);
 }
 
-void GUIManager::renderPlotAndStatsForSensor(const string sensorName, vector<float> &values){
+void GUIManager::renderPlotAndStatsForSensor(const string& sensorName, vector<float> &values){
     if (!values.empty()) {
         float min = *std::min_element(values.begin(), values.end());
         float max = *std::max_element(values.begin(), values.end());
@@ -210,7 +210,7 @@ void GUIManager::displayStatistics() {
     ImGui::Spacing();
 }
 
-float GUIManager::display_predict_temp(string sensorName) {
+float GUIManager::display_predict_temp(const string& sensorName) {
     for(auto &sensor: sensor_info){
         if(sensor.name == sensorName){
             float predict_value=-100;
