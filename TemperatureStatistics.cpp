@@ -21,20 +21,32 @@ void TemperatureStatistics::addSensorData(const string& sensorName, const vector
 
 void TemperatureStatistics::loadDataFromDatabase() {
     if (!databaseStorage) {
-        throw runtime_error("DatabaseStorage instance is not initialized");
+        throw std::runtime_error("DatabaseStorage instance is not initialized");
     }
 
-    // Check if data is already loaded
     if (!sensorTemperatures.empty() && !sensorTimestamps.empty()) {
-        return; // Data is already loaded, no need to reload
+        return;
     }
 
-    auto [timestamps, values] = databaseStorage->read_database();
+    auto jsonData = databaseStorage->read_database();
 
-    // Clear existing data and populate new data
     clearData();
-    for (const auto& [sensorName, temps] : values) {
-        addSensorData(sensorName, temps, timestamps[sensorName]);
+
+    for (const auto& sensorEntry : jsonData.items()) {
+        const std::string& sensorName = sensorEntry.key();           // Sensor name
+        const auto& data = sensorEntry.value();                      // Map of {timestamp: value}
+
+        std::vector<uint64_t> timestamps;
+        std::vector<float> values;
+
+        for (const auto& entry : data.items()) {
+            uint64_t timestamp = std::stoull(entry.key());           // Extract timestamp
+            float value = entry.value().get<float>();                // Extract temperature value
+            timestamps.push_back(timestamp);
+            values.push_back(value);
+        }
+
+        addSensorData(sensorName, values, timestamps);
     }
 }
 
