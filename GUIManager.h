@@ -14,8 +14,7 @@
 #include "SensorManager.h"
 #include "QueueManager.h"
 #include "Observer.h"
-#include "TemperatureStatistics.h"
-#include "Statistic.h"
+#include "Statistics.h"
 #include "InfoNode.h"
 
 class GUIManager {
@@ -27,8 +26,7 @@ private:
     QueueManager& queueManager;
     mutex& nodeDataMutex;
     UIObserver uiObserver;
-    Statistic& statistics;
-    TemperatureStatistics& tempStats;
+    Statistics& statistics;
     bool isMeasuring;
     bool showStats;
 
@@ -47,7 +45,7 @@ private:
     void displayStatistics();
 
 public:
-    GUIManager(DatabaseStorage& database, SensorManager& sensorManager, QueueManager& queueManager, Statistic& statistic, map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info, TemperatureStatistics& tempStats
+    GUIManager(DatabaseStorage& database, SensorManager& sensorManager, QueueManager& queueManager, Statistics& statistic, map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info
     );
     ~GUIManager();
 

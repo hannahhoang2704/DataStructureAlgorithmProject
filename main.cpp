@@ -5,9 +5,8 @@
 #include "SensorManager.h"
 #include "GUIManager.h"
 #include "TemperatureSensor.h"
-#include "Statistic.h"
+#include "Statistics.h"
 #include "LinearRegression.h"
-#include "TemperatureStatistics.h"
 
 using namespace std;
 
@@ -18,9 +17,8 @@ int main() {
         QueueManager queue_manager;
         DatabaseStorage database(json_file_path, queue_manager);
         SensorManager sensor_manager;
-        TemperatureStatistics tempStats(&database);
         LinearRegression linear_regression;
-        Statistic statistics(linear_regression, database);
+        Statistics statistics(linear_regression, database);
 
         std::vector<SensorInfo> sensors_config = {
                 {"sensor1", "28-00000087fb7c", 2},
@@ -36,7 +34,7 @@ int main() {
         mutex sensor_data_mutex;
     
         // Initialize GUIManager
-        GUIManager gui_manager(database, sensor_manager, queue_manager, statistics, sensors_data, sensor_data_mutex, sensors_config, tempStats);
+        GUIManager gui_manager(database, sensor_manager, queue_manager, statistics, sensors_data, sensor_data_mutex, sensors_config);
         gui_manager.initialize_gui();
 
         // Main loop

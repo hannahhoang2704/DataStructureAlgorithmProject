@@ -8,9 +8,9 @@
 #include "imgui_impl_opengl3.h"
 #include <iostream>
 
-GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, Statistic& statistic, map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info, TemperatureStatistics& tempStats)
+GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, Statistics& statistic, map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info)
         : database(db), sensorManager(sm), queueManager(qm), statistics(statistic), temp_map(data_map), nodeDataMutex(data_mutex), sensor_info(sensor_info),
-            uiObserver(temp_map, nodeDataMutex), tempStats(tempStats),
+            uiObserver(temp_map, nodeDataMutex),
           isMeasuring(false), showStats(false), window(nullptr), glsl_version(nullptr) {
     // Add the observer to the queue
     queueManager.add_observer(&uiObserver);
@@ -139,9 +139,9 @@ void GUIManager::renderPlotsAndStats() {
         ImGui::PlotLines("Temp 1", values1.data(), static_cast<int>(values1.size()), 0, nullptr, min1, max1, ImVec2(0, 200));
 
         ImGui::Spacing();
-        auto [sensor1Min, min1Timestamp] = tempStats.getMinTemperatureWithTimestamp("sensor1");
-        auto [sensor1Max, max1Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor1");
-        float sensor1Ave = tempStats.getAverageTemperature("sensor1");
+        auto [sensor1Min, min1Timestamp] = statistics.getMinTemperatureWithTimestamp("sensor1");
+        auto [sensor1Max, max1Timestamp] = statistics.getMaxTemperatureWithTimestamp("sensor1");
+        float sensor1Ave = statistics.getAverageTemperature("sensor1");
 
         std::string min1TimestampStr = min1Timestamp;
         std::string max1TimestampStr = max1Timestamp;
@@ -169,9 +169,9 @@ void GUIManager::renderPlotsAndStats() {
         ImGui::PlotLines("Temp 2", values2.data(), static_cast<int>(values2.size()), 0, nullptr, min2, max2, ImVec2(0, 200));
 
         ImGui::Spacing();
-        auto [sensor2Min, min2Timestamp] = tempStats.getMinTemperatureWithTimestamp("sensor2");
-        auto [sensor2Max, max2Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor2");
-        float sensor2Ave = tempStats.getAverageTemperature("sensor2");
+        auto [sensor2Min, min2Timestamp] = statistics.getMinTemperatureWithTimestamp("sensor2");
+        auto [sensor2Max, max2Timestamp] = statistics.getMaxTemperatureWithTimestamp("sensor2");
+        float sensor2Ave = statistics.getAverageTemperature("sensor2");
 
         std::string min2TimestampStr = min2Timestamp;
         std::string max2TimestampStr = max2Timestamp;
@@ -199,9 +199,9 @@ void GUIManager::renderPlotsAndStats() {
         ImGui::PlotLines("Temp 3", values3.data(), static_cast<int>(values3.size()), 0, nullptr, min3, max3, ImVec2(0, 200));
 
         ImGui::Spacing();
-        auto [sensor3Min, min3Timestamp] = tempStats.getMinTemperatureWithTimestamp("sensor3");
-        auto [sensor3Max, max3Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor3");
-        float sensor3Ave = tempStats.getAverageTemperature("sensor3");
+        auto [sensor3Min, min3Timestamp] = statistics.getMinTemperatureWithTimestamp("sensor3");
+        auto [sensor3Max, max3Timestamp] = statistics.getMaxTemperatureWithTimestamp("sensor3");
+        float sensor3Ave = statistics.getAverageTemperature("sensor3");
 
         std::string min3TimestampStr = min3Timestamp;
         std::string max3TimestampStr = max3Timestamp;
@@ -252,9 +252,9 @@ void GUIManager::updatePlotData() {
 
 void GUIManager::displayStatistics() {
     ImGui::Separator();
-    float globalMin = tempStats.getMinTemperature();
-    float globalMax = tempStats.getMaxTemperature();
-    float globalAvg = tempStats.getAverageTemperatureAllSensors();
+    float globalMin = statistics.getMinTemperature();
+    float globalMax = statistics.getMaxTemperature();
+    float globalAvg = statistics.getAverageTemperatureAllSensors();
 
     // Display the summary
     ImGui::Spacing();
