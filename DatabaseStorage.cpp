@@ -100,37 +100,45 @@ void DatabaseStorage::stop_write_thread() {
 //    return {sensorTimestamps, sensorValues};
 //}
 
-pair<map<string, vector<uint64_t>>, map<string, vector<float>>> DatabaseStorage::read_database() {
+json DatabaseStorage::read_database() {
     lock_guard<mutex> lock(file_lock);
+    ifstream read_file(file_path);
+    json j;
+    if(read_file.is_open()){
+        try {
+            read_file >> j;
+            read_file.close();
+        } catch (const std::exception &e) {
+            std::cerr << "Error reading JSON: " << e.what() << std::endl;
+            return json{}; // Return an empty JSON object on failure
+        }
+        return j;
+    }else{
+        cerr << "Can't open " << file_path << " to read data" << endl;
+        return json{};
+    }
+}
+
+pair<map<string, vector<uint64_t>>, map<string, vector<float>>> DatabaseStorage::process_data() {
+    auto j = read_database();
     map<string, vector<uint64_t>> sensorTimestamps;
     map<string, vector<float>> sensorValues;
 
-    ifstream read_file(file_path);
-    if (!read_file.is_open()) {
-        cerr << "Can't open " << file_path << " to read data" << endl;
-        return {sensorTimestamps, sensorValues};
-    }
-
-    json j;
-    try {
-        read_file >> j;
-        for (auto& sensor : j.items()) {
-            const string& sensorName = sensor.key();  // get the sensor name
-            auto& entries = sensor.value();          // get the map of {timestamp: value}
-
-            for (auto& entry : entries.items()) {
-                uint64_t timestamp = stoull(entry.key());
-                float value = entry.value().get<float>();
-                sensorTimestamps[sensorName][timestamp] = value;
-                sensorValues[sensorName][timestamp] = value;
-            }
+    for (auto& sensor : j.items()) {
+        const string& sensorName = sensor.key();  // get the sensor name
+        cout << "sensor name: " << sensorName <<endl;
+        auto& entries = sensor.value();           // get the map of {timestamp: value}
+        for (auto& entry : entries.items()) {
+            uint64_t timestamp = stoull(entry.key());
+            cout <<  "timestamp "<< timestamp << endl;
+            float value = entry.value().get<float>();
+            cout << "value : " << value << endl;
+            sensorTimestamps[sensorName].push_back(timestamp);
+            sensorValues[sensorName].push_back(value);
         }
-    } catch (const std::exception& e) {
-        cerr << "Error reading or parsing JSON: " << e.what() << endl;
     }
-
-    read_file.close();
     return {sensorTimestamps, sensorValues};
+
 }
 
 
