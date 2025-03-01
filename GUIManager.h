@@ -7,7 +7,6 @@
 
 #include <vector>
 #include <string>
-#include <vector>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include "DatabaseStorage.h"

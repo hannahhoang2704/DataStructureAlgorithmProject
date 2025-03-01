@@ -66,6 +66,19 @@ void Statistics::addSensorData(const string& sensorName, const vector<float>& te
     if (temps.size() != timestamps.size()) {
         throw runtime_error("Mismatch between temperature values and timestamps for sensor: " + sensorName);
     }
+    // Print the temperature and timestamp data for debugging
+    std::cout << "Adding data for sensor: " << sensorName << std::endl;
+    std::cout << "Temperatures: ";
+    for (const auto& temp : temps) {
+        std::cout << temp << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Timestamps: ";
+    for (const auto& timestamp : timestamps) {
+        std::cout << timestamp << " ";
+    }
+    std::cout << std::endl;
     sensorTemperatures[sensorName] = temps;
     sensorTimestamps[sensorName] = timestamps;
 }

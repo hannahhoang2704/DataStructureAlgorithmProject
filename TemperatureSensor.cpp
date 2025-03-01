@@ -88,8 +88,3 @@ float TemperatureSensor::get_temperature() {
     return -1;
 }
 
-float TemperatureSensor::temperature_getter() {
-    lock_guard<mutex> temp_lock(temp_mutex);
-    return temp;
-}
-

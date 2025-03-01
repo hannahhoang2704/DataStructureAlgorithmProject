@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <fstream>
 #include <atomic>
+#include <utility>
 #include "InfoNode.h"
 #include "QueueManager.h"
 #include "SensorManager.h"
@@ -22,7 +23,7 @@
 using namespace std;
 class TemperatureSensor {
 public:
-    TemperatureSensor(const string name, const string sensor_file_name, QueueManager& dequeue, int interval=1): name(name), file_name(sensor_file_name), queue_manager(dequeue), interval(interval), is_initialized(false){
+    TemperatureSensor(string  name, string  sensor_file_name, QueueManager& dequeue, int interval=1): name(std::move(name)), file_name(std::move(sensor_file_name)), queue_manager(dequeue), interval(interval), is_initialized(false){
         openFile();
     };
     ~TemperatureSensor();
@@ -30,7 +31,6 @@ public:
     void start_temp_reading_thread();
     void stop_temp_reading_thread();
     float get_temperature();
-    float temperature_getter();
     atomic<bool> is_initialized; //semaphore to notify UI that the sensor is initialized
 
 private:
