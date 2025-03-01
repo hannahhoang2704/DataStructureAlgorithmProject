@@ -6,7 +6,7 @@
 #define REGRESSION_DATA_SIZE 5
 
 bool Statistic::predict_future_temp(const std::string &sensor, uint64_t interval, float& predict_temp_val) {
-    auto [timestamps, temp_val] = db_reader.read_database();
+    auto [timestamps, temp_val] = db_reader.process_data();
     if(timestamps.find(sensor) == timestamps.end()){
         cerr << "Sensor not found" << endl;
         return false;

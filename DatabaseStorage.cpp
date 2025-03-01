@@ -18,73 +18,124 @@ void DatabaseStorage::start_write_thread() {
     cout << "Start database writer thread " << endl;
 }
 
-void DatabaseStorage::stop_write_thread() {
-    running = false;
-    if(database_writer.joinable()) database_writer.join();
-}
-
 void DatabaseStorage::write_database() {
-    while (running) {
+    while(running){
         InfoNode node;
-        if (queue_manager.pop_data(node)) {
+        if(queue_manager.pop_data(node)){
             lock_guard<mutex> lock(file_lock);
             data_container[node.name][node.timestamps] = node.temp;
 
-            // Open file for writing
             ofstream write_file(file_path);
             if (write_file.is_open()) {
-                // Start constructing the JSON manually
-                nlohmann::json json_data;
-                for (const auto& [sensorName, readings] : data_container) {
-                    nlohmann::json sensor_data; // JSON object for each sensor
-                    for (const auto& [timestamp, temperature] : readings) {
-                        // Manually convert uint64_t timestamp to string to avoid issues
-                        sensor_data[std::to_string(timestamp)] = temperature;
+                json json_data;
+                for (const auto& sensor : data_container) {
+                    json sensor_data;
+                    for (const auto& entry : sensor.second) {
+                        sensor_data[std::to_string(entry.first)] = entry.second;
                     }
-                    // Assign the sensor data object to the main JSON
-                    json_data[sensorName] = sensor_data;
+                    json_data[sensor.first] = sensor_data;
                 }
-                std::cout << "Write data " << json_data.dump(4) << " to json write_file " << file_path << std::endl;
-                write_file << json_data.dump(4);  // Pretty-print with 4 spaces
+                cout << "Write data " << json_data << " to json write_file " << file_path << endl;
+                write_file << json_data.dump(4);
                 write_file.close();
             } else {
                 cerr << "Can't open write_file " << file_path << " to write" << endl;
             }
         }
+//            if(write_file.is_open()){
+//                json_data = json(data_container);
+//                cout << "Write data " << json_data << " to json write_file " << file_path << endl;
+//                write_file << json_data.dump(4);
+//                write_file.close();
+//            }else{
+//                cerr << "Can't open write_file " << file_path << " to write" << endl;
+//            }
+//        }
 
-        // Sleep briefly before attempting to process the next node
-        this_thread::sleep_for(chrono::nanoseconds(500));
+        this_thread::sleep_for(chrono::nanoseconds(500) );
     }
     cout << "Stop database writer thread " << endl;
 }
 
+void DatabaseStorage::stop_write_thread() {
+    running = false;
+    if(database_writer.joinable()) database_writer.join();
+}
 
-pair<map<string, vector<uint64_t>>, map<string, vector<float>>> DatabaseStorage::read_database() {
+
+//pair<map<string, vector<uint64_t>>, map<string, vector<float>>> DatabaseStorage::read_database() {
+//    lock_guard<mutex> lock(file_lock);
+//    map<string, vector<uint64_t>> sensorTimestamps;
+//    map<string, vector<float>> sensorValues;
+//
+//    ifstream read_file(file_path);
+//    json j;
+//    if (read_file.is_open()) {
+//        try {
+//            read_file >> j;
+//            for (auto& sensor : j.items()) {
+//                const string& sensorName = sensor.key();  // get the sensor name
+//                auto& entries = sensor.value();          // get the array of [timestamp, value]
+//
+//                // Iterate through the array of [timestamp, value]
+//                for (auto& entry : entries) {
+//                    if (entry.is_array() && entry.size() == 2) {
+//                        uint64_t timestamp = entry[0].get<uint64_t>();
+//                        float value = entry[1].get<float>();
+//                        sensorTimestamps[sensorName].push_back(timestamp);
+//                        sensorValues[sensorName].push_back(value);
+//                    } else {
+//                        cerr << "Invalid entry format in JSON for sensor " << sensorName << endl;
+//                    }
+//                }
+//            }
+//            read_file.close();
+//        } catch (const std::exception& e) {
+//            std::cerr << "Error reading or parsing JSON: " << e.what() << std::endl;
+//        }
+//    } else {
+//        cerr << "Can't open " << file_path << " to read data" << endl;
+//    }
+//
+//    return {sensorTimestamps, sensorValues};
+//}
+
+json DatabaseStorage::read_database() {
     lock_guard<mutex> lock(file_lock);
+    ifstream read_file(file_path);
+    json j;
+    if(read_file.is_open()){
+        try {
+            read_file >> j;
+            read_file.close();
+        } catch (const std::exception &e) {
+            std::cerr << "Error reading JSON: " << e.what() << std::endl;
+            return json{}; // Return an empty JSON object on failure
+        }
+        return j;
+    }else{
+        cerr << "Can't open " << file_path << " to read data" << endl;
+        return json{};
+    }
+}
+
+pair<map<string, vector<uint64_t>>, map<string, vector<float>>> DatabaseStorage::process_data() {
+    auto j = read_database();
     map<string, vector<uint64_t>> sensorTimestamps;
     map<string, vector<float>> sensorValues;
 
-    ifstream read_file(file_path);
-    json j;
-    if (read_file.is_open()) {
-        try {
-            read_file >> j;  // Parse JSON from file
-            for (auto& [sensorName, readings] : j.items()) {
-                for (auto& [timestampStr, temperature] : readings.items()) {
-                    // Manually convert JSON string keys back to uint64_t and float values
-                    uint64_t timestamp = std::stoull(timestampStr);
-                    float value = temperature.get<float>();
-                    sensorTimestamps[sensorName].push_back(timestamp);
-                    sensorValues[sensorName].push_back(value);
-                }
-            }
-            read_file.close();
-        } catch (const std::exception& e) {
-            std::cerr << "Error reading or parsing JSON: " << e.what() << std::endl;
+    for (auto& sensor : j.items()) {
+        const string& sensorName = sensor.key();  // get the sensor name
+//        cout << "sensor name: " << sensorName <<endl;
+        auto& entries = sensor.value();           // get the map of {timestamp: value}
+        for (auto& entry : entries.items()) {
+            uint64_t timestamp = stoull(entry.key());
+//            cout <<  "timestamp "<< timestamp << endl;
+            float value = entry.value().get<float>();
+//            cout << "value : " << value << endl;
+            sensorTimestamps[sensorName].push_back(timestamp);
+            sensorValues[sensorName].push_back(value);
         }
-    } else {
-        cerr << "Can't open " << file_path << " to read data" << endl;
     }
-
     return {sensorTimestamps, sensorValues};
 }

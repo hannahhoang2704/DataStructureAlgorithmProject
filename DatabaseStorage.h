@@ -20,7 +20,8 @@ class DatabaseStorage {
 public:
     DatabaseStorage(string file_path, QueueManager& queue_manager);
     ~DatabaseStorage();
-    pair<map<string, vector<uint64_t>>, map<string, vector<float>>> read_database(); //returns parsed JSON data as a pair of maps for timestamps and values
+    json read_database();
+    pair<map<string, vector<uint64_t>>, map<string, vector<float>>> process_data();
     void start_write_thread();
     void stop_write_thread();
 

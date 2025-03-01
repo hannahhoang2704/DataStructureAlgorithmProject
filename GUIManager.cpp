@@ -242,7 +242,7 @@ void GUIManager::handleStopMeasurement() {
 }
 
 void GUIManager::updatePlotData() {
-    auto [timestamps, values] = database.read_database();
+    auto [timestamps, values] = database.process_data();
 
     // Prepare data for plotting
     statistics.preparePlotData("sensor1", timestamps, values, time1, values1);
