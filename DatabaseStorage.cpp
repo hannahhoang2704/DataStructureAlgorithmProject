@@ -91,37 +91,3 @@ pair<map<string, vector<uint64_t>>, map<string, vector<float>>> DatabaseStorage:
     return {sensorTimestamps, sensorValues};
 
 }
-
-void DatabaseStorage::preparePlotData(
-        const std::string &sensorName,
-        const map<std::string, vector<uint64_t>> &timestamps,
-        const map<std::string, vector<float>> &values,
-        vector<float> &timeInSeconds,
-        vector<float> &sensorValues
-) {
-    timeInSeconds.clear();
-    sensorValues.clear();
-
-    auto timeIter = timestamps.find(sensorName);
-    auto valueIter = values.find(sensorName);
-
-    if (timeIter == timestamps.end() || valueIter == values.end()) {
-        std::cerr << "Error: Sensor data not found for " << sensorName << std::endl;
-        return;
-    }
-
-    const vector<uint64_t>& rawTimestamps = timeIter->second;
-    const vector<float>& rawValues = valueIter->second;
-
-    if (rawTimestamps.empty() || rawValues.empty()) {
-        std::cerr << "Error: Sensor data is empty for " << sensorName << std::endl;
-        return;
-    }
-
-    // Normalize timestamps to start from 0
-    uint64_t startTime = rawTimestamps.front();
-    for (size_t i = 0; i < rawTimestamps.size() && i < rawValues.size(); ++i) {
-        timeInSeconds.push_back((rawTimestamps[i] - startTime) / 1000.0f); // Convert to seconds
-        sensorValues.push_back(rawValues[i]);
-    }
-}

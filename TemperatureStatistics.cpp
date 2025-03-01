@@ -28,26 +28,13 @@ void TemperatureStatistics::loadDataFromDatabase() {
         return;
     }
 
-    auto jsonData = databaseStorage->read_database();
+    auto [timestamps, values] = databaseStorage->process_data();
 
     clearData();
-
-    for (const auto& sensorEntry : jsonData.items()) {
-        const std::string& sensorName = sensorEntry.key();           // Sensor name
-        const auto& data = sensorEntry.value();                      // Map of {timestamp: value}
-
-        std::vector<uint64_t> timestamps;
-        std::vector<float> values;
-
-        for (const auto& entry : data.items()) {
-            uint64_t timestamp = std::stoull(entry.key());           // Extract timestamp
-            float value = entry.value().get<float>();                // Extract temperature value
-            timestamps.push_back(timestamp);
-            values.push_back(value);
-        }
-
-        addSensorData(sensorName, values, timestamps);
+    for (const auto& [sensorName, temps] : values) {
+        addSensorData(sensorName, temps, timestamps[sensorName]);
     }
+    std::cout << "Loaded data for " << values.size() << " sensors from the database." << std::endl;
 }
 
 pair<float, string> TemperatureStatistics::getMinTemperatureWithTimestamp(const string& sensorName) {
