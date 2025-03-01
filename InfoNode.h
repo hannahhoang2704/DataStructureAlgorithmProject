@@ -25,7 +25,6 @@ public:
 };
 
 
-using namespace std;
 struct SensorInfo {
     std::string name;
     std::string fileName;
