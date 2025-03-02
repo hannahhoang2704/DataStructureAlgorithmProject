@@ -153,10 +153,10 @@ void GUIManager::renderPlotAndStatsForSensor(const string& sensorName, vector<fl
                     sensorName.c_str(), sensorMin, minTimestampStr.c_str(), sensorName.c_str(), sensorMax, maxTimestampStr.c_str(), sensorName.c_str(), sensorAvg);
         ImGui::Spacing();
 
-        float sensorPrediction = display_predict_temp(sensorName);
-        if(sensorPrediction != -100){
-            ImGui::Text(" %s prediction: %.2f °C", sensorName.c_str(), sensorPrediction);
-        }
+//        float sensorPrediction = display_predict_temp(sensorName);
+//        if(sensorPrediction != -100){
+//            ImGui::Text(" %s prediction: %.2f °C", sensorName.c_str(), sensorPrediction);
+//        }
 
         ImGui::Spacing();
         ImGui::Spacing();
@@ -208,6 +208,10 @@ void GUIManager::displayStatistics() {
     ImGui::Text("  Minimum Temperature: %.2f °C", globalMin);
     ImGui::Text("  Maximum Temperature: %.2f °C", globalMax);
     ImGui::Text("  Average Temperature: %.2f °C", globalAvg);
+    ImGui::Text("Predict %s: %f", "sensor1", display_predict_temp("sensor1"));
+    ImGui::Text("Predict %s: %f", "sensor2", display_predict_temp("sensor2"));
+    ImGui::Text("Predict %s: %f", "sensor3", display_predict_temp("sensor3"));
+
     ImGui::Spacing();
     ImGui::Spacing();
 }
@@ -215,10 +219,10 @@ void GUIManager::displayStatistics() {
 float GUIManager::display_predict_temp(const string& sensorName) {
     for(auto &sensor: sensor_info){
         if(sensor.name == sensorName){
-            return statistics.predict_future_temp(sensor.name, static_cast<uint64_t>(sensor.interval));
-//            float predict_value=-100;
-//            if(statistics.predict_future_temp(sensor.name, static_cast<uint64_t>(sensor.interval), predict_value)) return predict_value;
-//            else{return -100;}
+//            return statistics.predict_future_temp(sensor.name, static_cast<uint64_t>(sensor.interval), );
+            float predict_value=-100;
+            if(statistics.predict_future_temp(sensor.name, static_cast<uint64_t>(sensor.interval), predict_value)) return predict_value;
+            else{return -100;}
         }
     }
     return -100;
