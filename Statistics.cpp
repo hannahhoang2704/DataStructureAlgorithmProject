@@ -88,7 +88,7 @@ void Statistics::addSensorData(const string& sensorName, const vector<float>& te
 
     // add data to Linear Regression instance to prepare for training
     cout << "add data to for linear regr " << sensorName;
-    for (size_t i = sensorTemperatures.size() - REGRESSION_DATA_SIZE; i < sensorTemperatures.size(); i++){
+    for (size_t i = sensorTemperatures[sensorName].size() - REGRESSION_DATA_SIZE; i < sensorTemperatures[sensorName].size(); i++){
         cout << temps[i] << " " << "[" << sensorTimestamps[sensorName][i] << "]" << " ";
         sensorRegressions[sensorName].addData(sensorTimestamps[sensorName][i], sensorTemperatures[sensorName][i], sensorTimestamps[sensorName][temps.size()-REGRESSION_DATA_SIZE]);
     }
