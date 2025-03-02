@@ -22,7 +22,6 @@ bool Statistics::predict_future_temp(const std::string &sensor, uint64_t interva
     for(size_t i = data_size - REGRESSION_DATA_SIZE; i < data_size; i++){
         sensorRegressions[sensor].addData(sensor_timestamps[i], sensor_values[i], sensor_timestamps[data_size-REGRESSION_DATA_SIZE]);
     }
-    cout << endl;
     auto future_timestamp = sensor_timestamps[data_size-1] + interval;
     if(!sensorRegressions[sensor].trainModel()){
         return false;
