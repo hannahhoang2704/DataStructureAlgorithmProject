@@ -143,6 +143,7 @@ void GUIManager::renderPlotAndStatsForSensor(const string& sensorName, vector<fl
         ImGui::PlotLines(("Temp " + sensorName).c_str(), values.data(), static_cast<int>(values.size()), 0, nullptr, min, max, ImVec2(0, 200));
 
         ImGui::Spacing();
+        statistics.loadDataFromDatabase();
         auto [sensorMin, minTimestamp] = statistics.getMinTemperatureWithTimestamp(sensorName);
         auto [sensorMax, maxTimestamp] = statistics.getMaxTemperatureWithTimestamp(sensorName);
         float sensorAvg = statistics.getAverageTemperature(sensorName);
@@ -195,6 +196,7 @@ void GUIManager::updatePlotData() {
 
 void GUIManager::displayStatistics() {
     ImGui::Separator();
+    statistics.loadDataFromDatabase();
     float globalMin = statistics.getMinTemperature();
     float globalMax = statistics.getMaxTemperature();
     float globalAvg = statistics.getAverageTemperatureAllSensors();
