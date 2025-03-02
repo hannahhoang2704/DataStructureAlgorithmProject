@@ -7,15 +7,13 @@
 
 #include <vector>
 #include <string>
-#include <vector>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include "DatabaseStorage.h"
 #include "SensorManager.h"
 #include "QueueManager.h"
 #include "Observer.h"
-#include "TemperatureStatistics.h"
-#include "Statistic.h"
+#include "Statistics.h"
 #include "InfoNode.h"
 
 class GUIManager {
@@ -27,8 +25,7 @@ private:
     QueueManager& queueManager;
     mutex& nodeDataMutex;
     UIObserver uiObserver;
-    Statistic& statistics;
-    TemperatureStatistics& tempStats;
+    Statistics& statistics;
     bool isMeasuring;
     bool showStats;
 
@@ -41,13 +38,14 @@ private:
     // Helper functions
     void renderControls();
     void renderPlotsAndStats();
+    void renderPlotAndStatsForSensor(const string& sensorName, vector<float> &value);
     void renderRealTimeValues();
     void updatePlotData();
-    float display_predict_temp(string sensorName);
+    float display_predict_temp(const string& sensorName);
     void displayStatistics();
 
 public:
-    GUIManager(DatabaseStorage& database, SensorManager& sensorManager, QueueManager& queueManager, Statistic& statistic, map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info, TemperatureStatistics& tempStats
+    GUIManager(DatabaseStorage& database, SensorManager& sensorManager, QueueManager& queueManager, Statistics& statistic, map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info
     );
     ~GUIManager();
 

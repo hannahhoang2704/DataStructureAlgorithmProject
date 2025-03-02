@@ -35,7 +35,7 @@ void DatabaseStorage::write_database() {
                     }
                     json_data[sensor.first] = sensor_data;
                 }
-                cout << "Write data " << json_data << " to json write_file " << file_path << endl;
+//                cout << "Write data " << json_data << " to json write_file " << file_path << endl;
                 write_file << json_data.dump(4);
                 write_file.close();
             } else {

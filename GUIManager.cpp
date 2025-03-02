@@ -8,9 +8,9 @@
 #include "imgui_impl_opengl3.h"
 #include <iostream>
 
-GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, Statistic& statistic, map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info, TemperatureStatistics& tempStats)
+GUIManager::GUIManager(DatabaseStorage& db, SensorManager& sm, QueueManager& qm, Statistics& statistic, map<string, float>& data_map, mutex& data_mutex, vector<SensorInfo>&sensor_info)
         : database(db), sensorManager(sm), queueManager(qm), statistics(statistic), temp_map(data_map), nodeDataMutex(data_mutex), sensor_info(sensor_info),
-            uiObserver(temp_map, nodeDataMutex), tempStats(tempStats),
+            uiObserver(temp_map, nodeDataMutex),
           isMeasuring(false), showStats(false), window(nullptr), glsl_version(nullptr) {
     // Add the observer to the queue
     queueManager.add_observer(&uiObserver);
@@ -127,98 +127,42 @@ void GUIManager::renderRealTimeValues() {
 
 
 void GUIManager::renderPlotsAndStats() {
+    renderPlotAndStatsForSensor("sensor1", values1);
+    renderPlotAndStatsForSensor("sensor2", values2);
+    renderPlotAndStatsForSensor("sensor3", values3);
+}
 
-    // Plot Sensor 1
-    if (!values1.empty()) {
-        float min1 = *std::min_element(values1.begin(), values1.end());
-        float max1 = *std::max_element(values1.begin(), values1.end());
-        max1 += 1.0f;  // Add a small buffer to make the graph more readable
-        min1 -= 1.0f;
+void GUIManager::renderPlotAndStatsForSensor(const string& sensorName, vector<float> &values){
+    if (!values.empty()) {
+        float min = *std::min_element(values.begin(), values.end());
+        float max = *std::max_element(values.begin(), values.end());
+        max += 1.0f;  // Add a small buffer to make the graph more readable
+        min -= 1.0f;
 
-        ImGui::Text("Sensor 1");
-        ImGui::PlotLines("Temp 1", values1.data(), static_cast<int>(values1.size()), 0, nullptr, min1, max1, ImVec2(0, 200));
-
-        ImGui::Spacing();
-        auto [sensor1Min, min1Timestamp] = tempStats.getMinTemperatureWithTimestamp("sensor1");
-        auto [sensor1Max, max1Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor1");
-        float sensor1Ave = tempStats.getAverageTemperature("sensor1");
-
-        std::string min1TimestampStr = min1Timestamp;
-        std::string max1TimestampStr = max1Timestamp;
-
-        ImGui::Text("  Sensor1 Min: %.2f °C (At %s) | Sensor1 Max: %.2f °C (At %s) | Sensor1 Avg: %.2f °C",
-                    sensor1Min, min1TimestampStr.c_str(), sensor1Max, max1TimestampStr.c_str(), sensor1Ave);
-        ImGui::Spacing();
-
-        float sensor1Prediction = display_predict_temp("sensor1");
-        ImGui::Text(" Sensor1 prediction: %.2f °C", sensor1Prediction);
+        ImGui::Text("%s", sensorName.c_str());
+        ImGui::PlotLines(("Temp " + sensorName).c_str(), values.data(), static_cast<int>(values.size()), 0, nullptr, min, max, ImVec2(0, 200));
 
         ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Separator();
-    }
-
-    // Plot Sensor 2
-    if (!values2.empty()) {
-        float min2 = *std::min_element(values2.begin(), values2.end());
-        float max2 = *std::max_element(values2.begin(), values2.end());
-        max2 += 1.0f;
-        min2 -= 1.0f;
-
-        ImGui::Text("Sensor 2");
-        ImGui::PlotLines("Temp 2", values2.data(), static_cast<int>(values2.size()), 0, nullptr, min2, max2, ImVec2(0, 200));
-
-        ImGui::Spacing();
-        auto [sensor2Min, min2Timestamp] = tempStats.getMinTemperatureWithTimestamp("sensor2");
-        auto [sensor2Max, max2Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor2");
-        float sensor2Ave = tempStats.getAverageTemperature("sensor2");
-
-        std::string min2TimestampStr = min2Timestamp;
-        std::string max2TimestampStr = max2Timestamp;
-
-        ImGui::Text("  Sensor2 Min: %.2f °C (At %s) | Sensor2 Max: %.2f °C (At %s) | Sensor2 Avg: %.2f °C",
-                    sensor2Min, min2TimestampStr.c_str(), sensor2Max, max2TimestampStr.c_str(), sensor2Ave);
+        statistics.loadDataFromDatabase();
+        auto [sensorMin, minTimestamp] = statistics.getMinTemperatureWithTimestamp(sensorName);
+        auto [sensorMax, maxTimestamp] = statistics.getMaxTemperatureWithTimestamp(sensorName);
+        float sensorAvg = statistics.getAverageTemperature(sensorName);
+        string minTimestampStr = minTimestamp;
+        string maxTimestampStr = maxTimestamp;
+        ImGui::Text("  %s Min: %.2f °C (At %s) | %s Max: %.2f °C (At %s) | %s Avg: %.2f °C",
+                    sensorName.c_str(), sensorMin, minTimestampStr.c_str(), sensorName.c_str(), sensorMax, maxTimestampStr.c_str(), sensorName.c_str(), sensorAvg);
         ImGui::Spacing();
 
-        float sensor2Prediction = display_predict_temp("sensor2");
-        ImGui::Text(" Sensor2 prediction: %.2f °C", sensor2Prediction);
-
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Separator();
-    }
-
-    // Plot Sensor 3
-    if (!values3.empty()) {
-        float min3 = *std::min_element(values3.begin(), values3.end());
-        float max3 = *std::max_element(values3.begin(), values3.end());
-        max3 += 1.0f;
-        min3 -= 1.0f;
-
-        ImGui::Text("Sensor 3");
-        ImGui::PlotLines("Temp 3", values3.data(), static_cast<int>(values3.size()), 0, nullptr, min3, max3, ImVec2(0, 200));
-
-        ImGui::Spacing();
-        auto [sensor3Min, min3Timestamp] = tempStats.getMinTemperatureWithTimestamp("sensor3");
-        auto [sensor3Max, max3Timestamp] = tempStats.getMaxTemperatureWithTimestamp("sensor3");
-        float sensor3Ave = tempStats.getAverageTemperature("sensor3");
-
-        std::string min3TimestampStr = min3Timestamp;
-        std::string max3TimestampStr = max3Timestamp;
-
-        ImGui::Text("  Sensor3 Min: %.2f °C (At %s) | Sensor3 Max: %.2f °C (At %s) | Sensor3 Avg: %.2f °C",
-                    sensor3Min, min3TimestampStr.c_str(), sensor3Max, max3TimestampStr.c_str(), sensor3Ave);
-        ImGui::Spacing();
-
-        float sensor3Prediction = display_predict_temp("sensor3");
-        ImGui::Text(" Sensor3 prediction: %.2f °C", sensor3Prediction);
+        float sensorPrediction = display_predict_temp(sensorName);
+        if(sensorPrediction != -100){
+            ImGui::Text(" %s prediction: %.2f °C", sensorName.c_str(), sensorPrediction);
+        }
 
         ImGui::Spacing();
         ImGui::Spacing();
         ImGui::Separator();
     }
 }
-
 
 void GUIManager::handleStartMeasurement() {
     // Start measurements
@@ -252,9 +196,10 @@ void GUIManager::updatePlotData() {
 
 void GUIManager::displayStatistics() {
     ImGui::Separator();
-    float globalMin = tempStats.getMinTemperature();
-    float globalMax = tempStats.getMaxTemperature();
-    float globalAvg = tempStats.getAverageTemperatureAllSensors();
+    statistics.loadDataFromDatabase();
+    float globalMin = statistics.getMinTemperature();
+    float globalMax = statistics.getMaxTemperature();
+    float globalAvg = statistics.getAverageTemperatureAllSensors();
 
     // Display the summary
     ImGui::Spacing();
@@ -267,13 +212,15 @@ void GUIManager::displayStatistics() {
     ImGui::Spacing();
 }
 
-float GUIManager::display_predict_temp(string sensorName) {
+float GUIManager::display_predict_temp(const string& sensorName) {
     for(auto &sensor: sensor_info){
-        float predict_value=-100;
-        statistics.predict_future_temp(sensorName, static_cast<uint64_t>(sensor.interval), predict_value);
-        return predict_value;
+        if(sensor.name == sensorName){
+            float predict_value=-100;
+            if(statistics.predict_future_temp(sensor.name, static_cast<uint64_t>(sensor.interval), predict_value)) return predict_value;
+            else{return -100;}
+        }
     }
-    return -100; // in case no matching sensor is found
+    return -100;
 }
 
 void GUIManager::cleanup_gui() {

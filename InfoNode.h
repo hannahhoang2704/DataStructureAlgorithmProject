@@ -4,11 +4,12 @@
 #include <string>
 #include <utility>
 
-
 #ifndef DATASTRUCTUREALGORITHMSPROJECT_INFONODE_H
 #define DATASTRUCTUREALGORITHMSPROJECT_INFONODE_H
 
 using namespace std;
+
+// Node of info that packs sensor name, timestamps and temperature value to communicate between QueueManager, TemperatureSensor and DatabaseStorage
 class InfoNode{
 public:
     string name;
@@ -24,7 +25,7 @@ public:
 
 };
 
-
+//Sensor config includes sensor name, file to read sensor data and reading frequencies
 struct SensorInfo {
     std::string name;
     std::string fileName;
