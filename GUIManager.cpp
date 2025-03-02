@@ -155,7 +155,7 @@ void GUIManager::renderPlotAndStatsForSensor(const string& sensorName, vector<fl
 
         float sensorPrediction = display_predict_temp(sensorName);
         if(sensorPrediction != -100){
-            ImGui::Text(" %s prediction: %.2f °C", sensorName.c_str(), sensorPrediction);
+            ImGui::Text("Prediction %s : %.2f °C", sensorName.c_str(), sensorPrediction);
         }
 
         ImGui::Spacing();
@@ -200,7 +200,9 @@ void GUIManager::displayStatistics() {
     float globalMin = statistics.getMinTemperature();
     float globalMax = statistics.getMaxTemperature();
     float globalAvg = statistics.getAverageTemperatureAllSensors();
-
+//    float predict_s1 = display_predict_temp("sensor1");
+//    float predict_s2 = display_predict_temp("sensor2");
+//    float predict_s3 = display_predict_temp("sensor3");
     // Display the summary
     ImGui::Spacing();
     ImGui::Spacing();
@@ -208,6 +210,17 @@ void GUIManager::displayStatistics() {
     ImGui::Text("  Minimum Temperature: %.2f °C", globalMin);
     ImGui::Text("  Maximum Temperature: %.2f °C", globalMax);
     ImGui::Text("  Average Temperature: %.2f °C", globalAvg);
+
+//    if (predict_s1 != -100) {
+//        ImGui::Text("  Prediction %s: %.2f °C", "sensor1", predict_s1);
+//    }
+//    if (predict_s2 != -100) {
+//        ImGui::Text("  Prediction %s: %.2f °C", "sensor2", predict_s2);
+//    }
+//    if (predict_s3 != -100) {
+//        ImGui::Text("  Prediction %s: %.2f °C", "sensor3", predict_s3);
+//    }
+
     ImGui::Spacing();
     ImGui::Spacing();
 }
@@ -216,8 +229,11 @@ float GUIManager::display_predict_temp(const string& sensorName) {
     for(auto &sensor: sensor_info){
         if(sensor.name == sensorName){
             float predict_value=-100;
-            if(statistics.predict_future_temp(sensor.name, static_cast<uint64_t>(sensor.interval), predict_value)) return predict_value;
-            else{return -100;}
+            if(statistics.predict_future_temp(sensor.name, static_cast<uint64_t>(sensor.interval), predict_value)) {
+                return predict_value;
+            }else{
+                return -100;
+            }
         }
     }
     return -100;

@@ -26,6 +26,7 @@ public:
 
     // Add new data points for regression
     void addData(uint64_t timestamp, float value, uint64_t start_time);
+    void clearData();
     bool trainModel();
     float predict_future(uint64_t future_timestamp, uint64_t start_time);
 };

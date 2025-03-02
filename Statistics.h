@@ -20,6 +20,7 @@ private:
     DatabaseStorage& db_reader;
     map<string, vector<float>> sensorTemperatures;
     map<string, vector<uint64_t>> sensorTimestamps;
+    map<string, LinearRegression> sensorRegressions; // Separate regression for each sensor
     static string formatTimestamp(uint64_t rawTimestamp);
 
 public:

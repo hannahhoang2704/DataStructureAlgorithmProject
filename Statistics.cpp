@@ -18,21 +18,18 @@ bool Statistics::predict_future_temp(const std::string &sensor, uint64_t interva
         cerr << "Not enough data to give prediction with " << data_size << " data stored in database" << endl;
         return false;
     }
-    cout << "add value for train linear regression: " << sensor << " ";
+    sensorRegressions[sensor].clearData();
     for(size_t i = data_size - REGRESSION_DATA_SIZE; i < data_size; i++){
-        cout << sensor_values[i] << " " << "[" << sensor_timestamps[i] << "]   ";
-        linear_regression.addData(sensor_timestamps[i], sensor_values[i], sensor_timestamps[data_size-REGRESSION_DATA_SIZE]);
+        sensorRegressions[sensor].addData(sensor_timestamps[i], sensor_values[i], sensor_timestamps[data_size-REGRESSION_DATA_SIZE]);
     }
-    cout << endl;
     auto future_timestamp = sensor_timestamps[data_size-1] + interval;
-    cout << "future timestamp " << future_timestamp << " " << "last timestamp " << sensor_timestamps[data_size-1];
-    if(!linear_regression.trainModel()){
+    if(!sensorRegressions[sensor].trainModel()){
         return false;
     }
-    predict_temp_val = linear_regression.predict_future(future_timestamp, sensor_timestamps[data_size-5]);
-    cout << " start timestamp " << sensor_timestamps[data_size -5] << endl;
+    predict_temp_val = sensorRegressions[sensor].predict_future(future_timestamp, sensor_timestamps[data_size-5]);
     return true;
 }
+
 
 void Statistics::preparePlotData(
         const std::string &sensorName,
@@ -77,9 +74,7 @@ void Statistics::addSensorData(const string& sensorName, const vector<float>& te
 
 
 void Statistics::loadDataFromDatabase() {
-
     auto [timestamps, values] = db_reader.process_data();
-
     clearData();
     for (const auto& [sensorName, temps] : values) {
         addSensorData(sensorName, temps, timestamps[sensorName]);
@@ -105,7 +100,6 @@ pair<float, string> Statistics::getMinTemperatureWithTimestamp(const string& sen
 }
 
 pair<float, string> Statistics::getMaxTemperatureWithTimestamp(const string& sensorName) {
-//    loadDataFromDatabase();
 
     auto sensorIt = sensorTemperatures.find(sensorName);
     if (sensorIt == sensorTemperatures.end() || sensorIt->second.empty()) {
