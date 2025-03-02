@@ -20,11 +20,13 @@ private:
     DatabaseStorage& db_reader;
     map<string, vector<float>> sensorTemperatures;
     map<string, vector<uint64_t>> sensorTimestamps;
+    map<string, LinearRegression> sensorRegressions; // Separate regression for each sensor
     static string formatTimestamp(uint64_t rawTimestamp);
 
 public:
     Statistics(LinearRegression &linear_reg, DatabaseStorage &db_reader): linear_regression(linear_reg), db_reader(db_reader){};
-    bool predict_future_temp(const string& sensor, uint64_t interval, float& predict_temp_val);
+//    bool predict_future_temp(const string& sensor, uint64_t interval, float& predict_temp_val);
+    float predict_future_temp(const std::string& sensorName, uint64_t interval);
     void preparePlotData(const string& sensorName,
                          const map<string, vector<uint64_t>>& timestamps,
                          const map<string, vector<float>>& values,

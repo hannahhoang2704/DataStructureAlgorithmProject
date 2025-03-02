@@ -215,9 +215,10 @@ void GUIManager::displayStatistics() {
 float GUIManager::display_predict_temp(const string& sensorName) {
     for(auto &sensor: sensor_info){
         if(sensor.name == sensorName){
-            float predict_value=-100;
-            if(statistics.predict_future_temp(sensor.name, static_cast<uint64_t>(sensor.interval), predict_value)) return predict_value;
-            else{return -100;}
+            return statistics.predict_future_temp(sensor.name, static_cast<uint64_t>(sensor.interval));
+//            float predict_value=-100;
+//            if(statistics.predict_future_temp(sensor.name, static_cast<uint64_t>(sensor.interval), predict_value)) return predict_value;
+//            else{return -100;}
         }
     }
     return -100;

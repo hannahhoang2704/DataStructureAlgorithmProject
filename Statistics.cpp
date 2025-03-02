@@ -5,34 +5,46 @@
 #include "Statistics.h"
 #define REGRESSION_DATA_SIZE 5
 
-bool Statistics::predict_future_temp(const std::string &sensor, uint64_t interval, float& predict_temp_val) {
-    auto [timestamps, temp_val] = db_reader.process_data();
-    if(timestamps.find(sensor) == timestamps.end()){
-        cerr << "Sensor not found" << endl;
-        return false;
+//bool Statistics::predict_future_temp(const std::string &sensor, uint64_t interval, float& predict_temp_val) {
+//    auto [timestamps, temp_val] = db_reader.process_data();
+//    if(timestamps.find(sensor) == timestamps.end()){
+//        cerr << "Sensor not found" << endl;
+//        return false;
+//    }
+//    const auto& sensor_timestamps = timestamps[sensor];
+//    const auto& sensor_values = temp_val[sensor];
+//    auto data_size = sensor_timestamps.size();
+//    if(data_size < REGRESSION_DATA_SIZE){
+//        cerr << "Not enough data to give prediction with " << data_size << " data stored in database" << endl;
+//        return false;
+//    }
+//    cout << "add value for train linear regression: " << sensor << " ";
+//    for(size_t i = data_size - REGRESSION_DATA_SIZE; i < data_size; i++){
+//        cout << sensor_values[i] << " " << "[" << sensor_timestamps[i] << "]   ";
+//        linear_regression.addData(sensor_timestamps[i], sensor_values[i], sensor_timestamps[data_size-REGRESSION_DATA_SIZE]);
+//    }
+//    cout << endl;
+//    auto future_timestamp = sensor_timestamps[data_size-1] + interval;
+//    cout << "future timestamp " << future_timestamp << " " << "last timestamp " << sensor_timestamps[data_size-1];
+//    if(!linear_regression.trainModel()){
+//        return false;
+//    }
+//    predict_temp_val = linear_regression.predict_future(future_timestamp, sensor_timestamps[data_size-5]);
+//    cout << " start timestamp " << sensor_timestamps[data_size -5] << endl;
+//    return true;
+//}
+float Statistics::predict_future_temp(const std::string &sensorName, uint64_t interval) {
+    if (sensorRegressions.find(sensorName) == sensorRegressions.end()) {
+        throw std::runtime_error("Sensor '" + sensorName + "' not found!");
     }
-    const auto& sensor_timestamps = timestamps[sensor];
-    const auto& sensor_values = temp_val[sensor];
-    auto data_size = sensor_timestamps.size();
-    if(data_size < REGRESSION_DATA_SIZE){
-        cerr << "Not enough data to give prediction with " << data_size << " data stored in database" << endl;
-        return false;
+    if(sensorRegressions[sensorName].trainModel()) {
+        float predict_temp_val = linear_regression.predict_future(interval);
+        return predict_temp_val;
+    }else{
+        return -100;
     }
-    cout << "add value for train linear regression: " << sensor << " ";
-    for(size_t i = data_size - REGRESSION_DATA_SIZE; i < data_size; i++){
-        cout << sensor_values[i] << " " << "[" << sensor_timestamps[i] << "]   ";
-        linear_regression.addData(sensor_timestamps[i], sensor_values[i], sensor_timestamps[data_size-REGRESSION_DATA_SIZE]);
-    }
-    cout << endl;
-    auto future_timestamp = sensor_timestamps[data_size-1] + interval;
-    cout << "future timestamp " << future_timestamp << " " << "last timestamp " << sensor_timestamps[data_size-1];
-    if(!linear_regression.trainModel()){
-        return false;
-    }
-    predict_temp_val = linear_regression.predict_future(future_timestamp, sensor_timestamps[data_size-5]);
-    cout << " start timestamp " << sensor_timestamps[data_size -5] << endl;
-    return true;
 }
+
 
 void Statistics::preparePlotData(
         const std::string &sensorName,
@@ -73,6 +85,11 @@ void Statistics::addSensorData(const string& sensorName, const vector<float>& te
     }
     sensorTemperatures[sensorName] = temps;
     sensorTimestamps[sensorName] = timestamps;
+
+    // add data to Linear Regression instance to prepare for training
+    for (size_t i = temps.size() - REGRESSION_DATA_SIZE; i < temps.size(); i++){
+        sensorRegressions[sensorName].addData(timestamps[i], temps[i], timestamps[temps.size()-REGRESSION_DATA_SIZE]);
+    }
 }
 
 
@@ -81,7 +98,9 @@ void Statistics::loadDataFromDatabase() {
     auto [timestamps, values] = db_reader.process_data();
 
     clearData();
+
     for (const auto& [sensorName, temps] : values) {
+        sensorRegressions[sensorName].clearData(); // clear data from linear regression instance to recalculate
         addSensorData(sensorName, temps, timestamps[sensorName]);
     }
 }
@@ -105,7 +124,6 @@ pair<float, string> Statistics::getMinTemperatureWithTimestamp(const string& sen
 }
 
 pair<float, string> Statistics::getMaxTemperatureWithTimestamp(const string& sensorName) {
-//    loadDataFromDatabase();
 
     auto sensorIt = sensorTemperatures.find(sensorName);
     if (sensorIt == sensorTemperatures.end() || sensorIt->second.empty()) {
