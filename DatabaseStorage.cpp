@@ -78,12 +78,16 @@ pair<map<string, vector<uint64_t>>, map<string, vector<float>>> DatabaseStorage:
     map<string, vector<uint64_t>> sensorTimestamps;
     map<string, vector<float>> sensorValues;
 
+    cout << "process data: ";
     for (auto& sensor : j.items()) {
         const string& sensorName = sensor.key();  // get the sensor name
+        cout << "sensor name: " << sensorName << endl;
         auto& entries = sensor.value();           // get the map of {timestamp: value}
         for (auto& entry : entries.items()) {
             uint64_t timestamp = stoull(entry.key());
+            cout << "timestamp: "<<timestamp << endl;
             float value = entry.value().get<float>();
+            cout << "value : " << value << endl;
             sensorTimestamps[sensorName].push_back(timestamp);
             sensorValues[sensorName].push_back(value);
         }
