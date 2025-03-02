@@ -71,28 +71,12 @@ void Statistics::addSensorData(const string& sensorName, const vector<float>& te
     if (temps.size() != timestamps.size()) {
         throw runtime_error("Mismatch between temperature values and timestamps for sensor: " + sensorName);
     }
-    // Print the temperature and timestamp data for debugging
-//    std::cout << "Adding data for sensor: " << sensorName << std::endl;
-//    std::cout << "Temperatures: ";
-//    for (const auto& temp : temps) {
-//        std::cout << temp << " ";
-//    }
-//    std::cout << std::endl;
-//
-//    std::cout << "Timestamps: ";
-//    for (const auto& timestamp : timestamps) {
-//        std::cout << timestamp << " ";
-//    }
-//    std::cout << std::endl;
     sensorTemperatures[sensorName] = temps;
     sensorTimestamps[sensorName] = timestamps;
 }
 
 
 void Statistics::loadDataFromDatabase() {
-//    if (!sensorTemperatures.empty() && !sensorTimestamps.empty()) {
-//        return;
-//    }
 
     auto [timestamps, values] = db_reader.process_data();
 
@@ -100,11 +84,9 @@ void Statistics::loadDataFromDatabase() {
     for (const auto& [sensorName, temps] : values) {
         addSensorData(sensorName, temps, timestamps[sensorName]);
     }
-//    std::cout << "Loaded data for " << values.size() << " sensors from the database." << std::endl;
 }
 
 pair<float, string> Statistics::getMinTemperatureWithTimestamp(const string& sensorName) {
-//    loadDataFromDatabase();
 
     auto sensorIt = sensorTemperatures.find(sensorName);
     if (sensorIt == sensorTemperatures.end() || sensorIt->second.empty()) {
@@ -142,7 +124,6 @@ pair<float, string> Statistics::getMaxTemperatureWithTimestamp(const string& sen
 }
 
 float Statistics::getMinTemperature() {
-//    loadDataFromDatabase();
 
     if (sensorTemperatures.empty()) {
         throw runtime_error("No temperature data available.");
@@ -158,7 +139,6 @@ float Statistics::getMinTemperature() {
 }
 
 float Statistics::getMaxTemperature() {
-//    loadDataFromDatabase();
 
     if (sensorTemperatures.empty()) {
         throw runtime_error("No temperature data available.");
@@ -174,7 +154,6 @@ float Statistics::getMaxTemperature() {
 }
 
 float Statistics::getAverageTemperature(const string& sensorName) {
-//    loadDataFromDatabase();
 
     auto sensorIt = sensorTemperatures.find(sensorName);
     if (sensorIt == sensorTemperatures.end() || sensorIt->second.empty()) {
@@ -187,7 +166,6 @@ float Statistics::getAverageTemperature(const string& sensorName) {
 }
 
 float Statistics::getAverageTemperatureAllSensors() {
-//    loadDataFromDatabase();
 
     if (sensorTemperatures.empty()) {
         throw runtime_error("No temperature data available.");
