@@ -18,17 +18,19 @@ bool Statistics::predict_future_temp(const std::string &sensor, uint64_t interva
         cerr << "Not enough data to give prediction with " << data_size << " data stored in database" << endl;
         return false;
     }
-    cout << "add value for train linear regression: ";
+    cout << "add value for train linear regression: " << sensor << " ";
     for(size_t i = data_size - REGRESSION_DATA_SIZE; i < data_size; i++){
-        cout << sensor_values[i] << " ";
+        cout << sensor_values[i] << " " << "[" << sensor_timestamps[i] << "]   ";
         linear_regression.addData(sensor_timestamps[i], sensor_values[i], sensor_timestamps[data_size-REGRESSION_DATA_SIZE]);
     }
     cout << endl;
     auto future_timestamp = sensor_timestamps[data_size-1] + interval;
+    cout << "future timestamp " << future_timestamp << " " << "last timestamp " << sensor_timestamps[data_size-1];
     if(!linear_regression.trainModel()){
         return false;
     }
     predict_temp_val = linear_regression.predict_future(future_timestamp, sensor_timestamps[data_size-5]);
+    cout << " start timestamp " << sensor_timestamps[data_size -5] << endl;
     return true;
 }
 
@@ -70,27 +72,27 @@ void Statistics::addSensorData(const string& sensorName, const vector<float>& te
         throw runtime_error("Mismatch between temperature values and timestamps for sensor: " + sensorName);
     }
     // Print the temperature and timestamp data for debugging
-    std::cout << "Adding data for sensor: " << sensorName << std::endl;
-    std::cout << "Temperatures: ";
-    for (const auto& temp : temps) {
-        std::cout << temp << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "Timestamps: ";
-    for (const auto& timestamp : timestamps) {
-        std::cout << timestamp << " ";
-    }
-    std::cout << std::endl;
+//    std::cout << "Adding data for sensor: " << sensorName << std::endl;
+//    std::cout << "Temperatures: ";
+//    for (const auto& temp : temps) {
+//        std::cout << temp << " ";
+//    }
+//    std::cout << std::endl;
+//
+//    std::cout << "Timestamps: ";
+//    for (const auto& timestamp : timestamps) {
+//        std::cout << timestamp << " ";
+//    }
+//    std::cout << std::endl;
     sensorTemperatures[sensorName] = temps;
     sensorTimestamps[sensorName] = timestamps;
 }
 
 
 void Statistics::loadDataFromDatabase() {
-    if (!sensorTemperatures.empty() && !sensorTimestamps.empty()) {
-        return;
-    }
+//    if (!sensorTemperatures.empty() && !sensorTimestamps.empty()) {
+//        return;
+//    }
 
     auto [timestamps, values] = db_reader.process_data();
 
@@ -98,7 +100,7 @@ void Statistics::loadDataFromDatabase() {
     for (const auto& [sensorName, temps] : values) {
         addSensorData(sensorName, temps, timestamps[sensorName]);
     }
-    std::cout << "Loaded data for " << values.size() << " sensors from the database." << std::endl;
+//    std::cout << "Loaded data for " << values.size() << " sensors from the database." << std::endl;
 }
 
 pair<float, string> Statistics::getMinTemperatureWithTimestamp(const string& sensorName) {
