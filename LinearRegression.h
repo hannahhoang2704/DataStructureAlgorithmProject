@@ -29,7 +29,6 @@ public:
     void clearData();
     bool trainModel();
     float predict_future(uint64_t future_timestamp, uint64_t start_time);
-//    float predict_future(uint64_t interval);
 };
 
 

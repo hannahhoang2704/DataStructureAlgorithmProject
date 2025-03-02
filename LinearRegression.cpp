@@ -53,11 +53,3 @@ float LinearRegression::predict_future(uint64_t future_timestamp, uint64_t start
     float t = (float)(future_timestamp - start_time) / 1000.0f;
     return coeff * t + constTerm;
 }
-
-//float LinearRegression::predict_future(uint64_t interval) {
-//    lock_guard<mutex> lock(reg_mutex);
-//    uint64_t future_timestamp = time.back() + interval;
-//    uint64_t start_time = time.front();
-//    float t = (float)(future_timestamp - start_time) / 1000.0f;
-//    return coeff * t + constTerm;
-//}

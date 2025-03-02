@@ -19,33 +19,17 @@ bool Statistics::predict_future_temp(const std::string &sensor, uint64_t interva
         return false;
     }
     sensorRegressions[sensor].clearData();
-    cout << "add value for train linear regression: " << sensor << " ";
     for(size_t i = data_size - REGRESSION_DATA_SIZE; i < data_size; i++){
-        cout << sensor_values[i] << " " << "[" << sensor_timestamps[i] << "]   ";
-//        linear_regression.addData(sensor_timestamps[i], sensor_values[i], sensor_timestamps[data_size-REGRESSION_DATA_SIZE]);
         sensorRegressions[sensor].addData(sensor_timestamps[i], sensor_values[i], sensor_timestamps[data_size-REGRESSION_DATA_SIZE]);
     }
     cout << endl;
     auto future_timestamp = sensor_timestamps[data_size-1] + interval;
-//    cout << "future timestamp " << future_timestamp << " " << "last timestamp " << sensor_timestamps[data_size-1];
     if(!sensorRegressions[sensor].trainModel()){
         return false;
     }
     predict_temp_val = sensorRegressions[sensor].predict_future(future_timestamp, sensor_timestamps[data_size-5]);
-//    cout << " start timestamp " << sensor_timestamps[data_size -5] << endl;
     return true;
 }
-//float Statistics::predict_future_temp(const std::string &sensorName, uint64_t interval) {
-//    if (sensorRegressions.find(sensorName) == sensorRegressions.end()) {
-//        throw std::runtime_error("Sensor '" + sensorName + "' not found!");
-//    }
-//    if(sensorRegressions[sensorName].trainModel()) {
-//        float predict_temp_val = linear_regression.predict_future(interval);
-//        return predict_temp_val;
-//    }else{
-//        return -100;
-//    }
-//}
 
 
 void Statistics::preparePlotData(
@@ -87,25 +71,13 @@ void Statistics::addSensorData(const string& sensorName, const vector<float>& te
     }
     sensorTemperatures[sensorName] = temps;
     sensorTimestamps[sensorName] = timestamps;
-
-    // add data to Linear Regression instance to prepare for training
-//    cout << "add data to for linear regr " << sensorName;
-//    size_t data_size = sensorTemperatures[sensorName].size();
-//    for (size_t i = data_size - REGRESSION_DATA_SIZE; i < data_size; i++){
-////        cout << temps[i] << " " << "[" << sensorTimestamps[sensorName][i] << "]" << " ";
-//        sensorRegressions[sensorName].addData(sensorTimestamps[sensorName][i], sensorTemperatures[sensorName][i], sensorTimestamps[sensorName][temps.size()-REGRESSION_DATA_SIZE]);
-//    }
 }
 
 
 void Statistics::loadDataFromDatabase() {
-
     auto [timestamps, values] = db_reader.process_data();
-
     clearData();
-
     for (const auto& [sensorName, temps] : values) {
-//        sensorRegressions[sensorName].clearData(); // clear data from linear regression instance to recalculate
         addSensorData(sensorName, temps, timestamps[sensorName]);
     }
 }
